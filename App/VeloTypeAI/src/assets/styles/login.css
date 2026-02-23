@@ -11,7 +11,7 @@
 .login-page {
   background-color: var(--bg-color);
   color: var(--text-color);
-  min-height: 100vh;
+  height: 100vh;
   width:100vw;
   font-family: 'Roboto Mono', monospace;
   display: flex;
