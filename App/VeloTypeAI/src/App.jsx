@@ -7,9 +7,23 @@ import Login from './components/login.jsx'
 function App() {
   const [count, setCount] = useState(0)
 
+  function contact_ui_changer()
+  {
+      setUI((oldUI) => 'contact');
+  }
+
+  let actual_ui;
+  if(ui=='login')
+  {
+    actual_ui = <Login contact_ui_changer={contact_ui_changer}/>
+  }
+  else if(ui=='contact')
+  {
+    actual_ui = <Contact />
+  }
   return (
     <>
-      <Login />
+      {actual_ui}
     </>
   )
 }
