@@ -3,9 +3,10 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 // import './App.css'
 import Login from './components/login.jsx'
+import Contact from './components/contact.jsx'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [ui, setUI] = useState('login');
 
   function contact_ui_changer()
   {
