@@ -6,26 +6,14 @@ import Login from './components/login.jsx'
 import Contact from './components/contact.jsx'
 import Security from './components/security.jsx'
 
+import { Routes, Route } from "react-router-dom"
+
 function App() {
-  const [ui, setUI] = useState('login');
-
-  function contact_ui_changer()
-  {
-      setUI((oldUI) => 'contact');
-  }
-  function security_ui_changer()
-  {
-    setUI((oldUI) => 'security');
-  }
-
-  
-  return (
-    <>
-      {ui=="login"? <Login contact_ui_changer={contact_ui_changer} security_ui_changer={security_ui_changer}/> : null}
-      {ui=="contact"? <Contact /> : null}
-      {ui=="security"? <Security /> : null}
-    </>
-  )
+  <Routes>
+      <Route path="/" element={<Login/>} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/security" element={<Security />} />
+  </Routes>
 }
 
 export default App
