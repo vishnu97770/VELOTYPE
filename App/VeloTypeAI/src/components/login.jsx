@@ -5,7 +5,8 @@ import SecurityBtn from './securitybtn.jsx'
 
 import Footer from './footer.jsx'
 
-const Login = (props) => {
+function Login()
+{
     const [rememberMe, setRememberMe] = useState(true);
 
     return (
