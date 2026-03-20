@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import '../assets/styles/login.css';
-import ContactBtn from './contactbtn.jsx'
-import SecurityBtn from './securitybtn.jsx'
 
 import Footer from './footer.jsx'
 
