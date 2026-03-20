@@ -5,7 +5,8 @@ const styles = `
     font-family: 'Roboto Mono', 'Courier New', monospace;
     background-color: #2c2e31;
     color: #d1d0c5;
-    min-height: 100vh;
+    height: auto;
+    width: 100vw;
     padding: 40px 60px;
     box-sizing: border-box;
     line-height: 1.7;
@@ -33,7 +34,7 @@ const styles = `
   .privacy-intro {
     color: #d1d0c5;
     margin-bottom: 36px;
-    max-width: 860px;
+    width: 1000px;
   }
 
   /* ── TOC ── */
@@ -63,7 +64,7 @@ const styles = `
   /* ── Sections ── */
   .privacy-section {
     margin-bottom: 48px;
-    max-width: 860px;
+    max-width: 1000px;
   }
   .privacy-section h2 {
     font-family: 'Roboto Mono', monospace;
@@ -105,7 +106,7 @@ const styles = `
     border: none;
     border-top: 1px solid #3e4044;
     margin: 0 0 48px 0;
-    max-width: 860px;
+    max-width: 1000px;
   }
 
   /* ── Last updated tag ── */
