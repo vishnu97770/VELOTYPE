@@ -1,3 +1,11 @@
+const SAMPLE_PROMPTS = [
+  "the quick brown fox jumps over the lazy dog and runs across the open field under the bright morning sun",
+  "practice makes perfect and every keystroke you take brings you one step closer to becoming a faster typist",
+  "consistency is the key to improvement track your mistakes learn from them and watch your speed increase",
+  "typing is a skill that improves with deliberate focused practice every session teaches you something new",
+  "the best way to get better at typing is to slow down first and focus on accuracy before chasing speed",
+];
+
 function pickPrompt() {
   return SAMPLE_PROMPTS[Math.floor(Math.random() * SAMPLE_PROMPTS.length)];
 }
