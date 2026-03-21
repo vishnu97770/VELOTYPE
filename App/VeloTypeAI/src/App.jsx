@@ -6,6 +6,7 @@ import Login from './components/login.jsx'
 import Contact from './components/contact.jsx'
 import Security from './components/security.jsx'
 import Privacy from './components/privacy.jsx'
+import TypingTest from './components/TypingTest.jsx'
 
 import { Routes, Route } from "react-router-dom"
 
