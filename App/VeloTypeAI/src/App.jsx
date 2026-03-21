@@ -18,6 +18,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/security" element={<Security />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/typing" element={<TypingTest />} />
       </Routes>
     </>
   )
