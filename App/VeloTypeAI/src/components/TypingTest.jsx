@@ -8,6 +8,146 @@ const SAMPLE_PROMPTS = [
   "the best way to get better at typing is to slow down first and focus on accuracy before chasing speed",
 ];
 
+
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .tt-page {
+    font-family: 'Roboto Mono', monospace;
+    background-color: #2c2e31;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #d1d0c5;
+  }
+
+  /* ── Top bar ── */
+  .tt-topbar {
+    width: 100%;
+    max-width: 820px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 36px;
+  }
+  .tt-brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e2b714;
+    letter-spacing: 1px;
+  }
+  .tt-brand span {
+    color: #646669;
+    font-weight: 300;
+  }
+
+  /* ── Mode bar ── */
+  .tt-modebar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tt-mode-btn {
+    background: none;
+    border: none;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 13px;
+    color: #646669;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .tt-mode-btn:hover { color: #d1d0c5; background: #3e4044; }
+  .tt-mode-btn.active { color: #e2b714; background: #3e4044; }
+  .tt-mode-sep {
+    color: #3e4044;
+    font-size: 16px;
+    user-select: none;
+  }
+
+  /* ── Stats row (live) ── */
+  .tt-stats {
+    width: 100%;
+    max-width: 820px;
+    display: flex;
+    gap: 32px;
+    margin-bottom: 20px;
+    min-height: 52px;
+    align-items: flex-end;
+  }
+  .tt-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  .tt-stat-label {
+    font-size: 11px;
+    color: #646669;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .tt-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e2b714;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .tt-stat-value.dim { color: #646669; }
+
+  /* ── Typing area ── */
+  .tt-area {
+    width: 100%;
+    max-width: 820px;
+    position: relative;
+    cursor: text;
+  }
+
+  /* ── Words display ── */
+  .tt-words {
+    font-size: 22px;
+    line-height: 1.75;
+    letter-spacing: 0.5px;
+    color: #646669;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    max-height: calc(1.75em * 3);   /* show 3 lines */
+  }
+  .tt-words-inner {
+    transition: transform 0.15s ease;
+  }
+
+  /* ── Character states ── */
+  .tt-char { position: relative; }
+  .tt-char.correct  { color: #d1d0c5; }
+  .tt-char.incorrect { color: #ca4754; text-decoration: underline; text-decoration-color: #ca4754; }
+  .tt-char.current  { color: #d1d0c5; }
+  .tt-char.extra    { color: #ca4754; font-size: 0.9em; }
+
+  /* ── Caret ── */
+  .tt-char.current::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: #e2b714;
+    border-radius: 2px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+`;
+
 function pickPrompt() {
   return SAMPLE_PROMPTS[Math.floor(Math.random() * SAMPLE_PROMPTS.length)];
 }
