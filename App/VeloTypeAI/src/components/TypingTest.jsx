@@ -1,3 +1,5 @@
+import {useState, useRef, useEffect, useCallback} from 'react'
+
 const SAMPLE_PROMPTS = [
   "the quick brown fox jumps over the lazy dog and runs across the open field under the bright morning sun",
   "practice makes perfect and every keystroke you take brings you one step closer to becoming a faster typist",
