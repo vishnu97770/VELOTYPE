@@ -146,6 +146,150 @@ const styles = `
     0%, 100% { opacity: 1; }
     50%       { opacity: 0; }
   }
+    
+  /* ── Hidden real input ── */
+  .tt-input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    top: 0; left: 0;
+    pointer-events: none;
+  }
+
+  /* ── Click-to-focus hint ── */
+  .tt-focus-hint {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 12px;
+    color: #3e4044;
+    letter-spacing: 1px;
+    transition: opacity 0.2s;
+  }
+  .tt-focus-hint.hidden { opacity: 0; }
+
+  /* ── Progress bar ── */
+  .tt-progress-track {
+    width: 100%;
+    max-width: 820px;
+    height: 3px;
+    background: #3e4044;
+    border-radius: 2px;
+    margin-top: 18px;
+    overflow: hidden;
+  }
+  .tt-progress-fill {
+    height: 100%;
+    background: #e2b714;
+    border-radius: 2px;
+    transition: width 0.1s linear;
+  }
+
+  /* ── Action buttons ── */
+  .tt-actions {
+    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .tt-btn {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 13px;
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .tt-btn:active { transform: scale(0.97); }
+  .tt-btn-primary {
+    background: #e2b714;
+    color: #2c2e31;
+    font-weight: 700;
+  }
+  .tt-btn-primary:hover { background: #f0cc30; }
+  .tt-btn-ghost {
+    background: #3e4044;
+    color: #646669;
+  }
+  .tt-btn-ghost:hover { background: #4a4e54; color: #d1d0c5; }
+
+  /* ── Results overlay ── */
+  .tt-results {
+    width: 100%;
+    max-width: 820px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .tt-results-title {
+    font-size: 13px;
+    color: #646669;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .tt-results-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+  @media (max-width: 600px) {
+    .tt-results-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .tt-result-card {
+    background: #3e4044;
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .tt-result-card-label {
+    font-size: 11px;
+    color: #646669;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  .tt-result-card-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #e2b714;
+    line-height: 1;
+  }
+  .tt-result-card-unit {
+    font-size: 12px;
+    color: #646669;
+    margin-top: 4px;
+  }
+
+  /* ── Mistakes list ── */
+  .tt-mistakes-title {
+    font-size: 12px;
+    color: #646669;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .tt-mistakes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .tt-mistake-chip {
+    background: #3e4044;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tt-mistake-expected { color: #d1d0c5; }
+  .tt-mistake-arrow    { color: #646669; font-size: 10px; }
+  .tt-mistake-typed    { color: #ca4754; }
 `;
 
 function pickPrompt() {
