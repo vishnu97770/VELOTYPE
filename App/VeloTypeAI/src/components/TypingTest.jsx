@@ -10,286 +10,345 @@ const SAMPLE_PROMPTS = [
 
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .tt-page {
-    font-family: 'Roboto Mono', monospace;
-    background-color: #2c2e31;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    color: #d1d0c5;
-  }
+/* ── Page ── */
+.tt-page {
+  font-family: 'Roboto Mono', monospace;
+  background-color: #2c2e31;
 
-  /* ── Top bar ── */
-  .tt-topbar {
-    width: 100%;
-    max-width: 820px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 36px;
-  }
-  .tt-brand {
-    font-size: 20px;
-    font-weight: 700;
-    color: #e2b714;
-    letter-spacing: 1px;
-  }
-  .tt-brand span {
-    color: #646669;
-    font-weight: 300;
-  }
+  height: 100vh;
+  width: 100vw;
 
-  /* ── Mode bar ── */
-  .tt-modebar {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .tt-mode-btn {
-    background: none;
-    border: none;
-    font-family: 'Roboto Mono', monospace;
-    font-size: 13px;
-    color: #646669;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: color 0.15s, background 0.15s;
-  }
-  .tt-mode-btn:hover { color: #d1d0c5; background: #3e4044; }
-  .tt-mode-btn.active { color: #e2b714; background: #3e4044; }
-  .tt-mode-sep {
-    color: #3e4044;
-    font-size: 16px;
-    user-select: none;
-  }
+  display: flex;
+  flex-direction: column;
 
-  /* ── Stats row (live) ── */
-  .tt-stats {
-    width: 100%;
-    max-width: 820px;
-    display: flex;
-    gap: 32px;
-    margin-bottom: 20px;
-    min-height: 52px;
-    align-items: flex-end;
-  }
-  .tt-stat {
-    display: flex;
-    flex-direction: column;
-  }
-  .tt-stat-label {
-    font-size: 11px;
-    color: #646669;
-    letter-spacing: 1px;
-    margin-bottom: 2px;
-  }
-  .tt-stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: #e2b714;
-    line-height: 1;
-    transition: color 0.2s;
-  }
-  .tt-stat-value.dim { color: #646669; }
+  padding: 40px 60px;
+  color: #d1d0c5;
+}
 
-  /* ── Typing area ── */
-  .tt-area {
-    width: 100%;
-    max-width: 820px;
-    position: relative;
-    cursor: text;
-  }
+/* ── Container (NEW) ── */
+.tt-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 
-  /* ── Words display ── */
-  .tt-words {
-    font-size: 22px;
-    line-height: 1.75;
-    letter-spacing: 0.5px;
-    color: #646669;
-    user-select: none;
-    position: relative;
-    overflow: hidden;
-    max-height: calc(1.75em * 3);   /* show 3 lines */
-  }
-  .tt-words-inner {
-    transition: transform 0.15s ease;
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
 
-  /* ── Character states ── */
-  .tt-char { position: relative; }
-  .tt-char.correct  { color: #d1d0c5; }
-  .tt-char.incorrect { color: #ca4754; text-decoration: underline; text-decoration-color: #ca4754; }
-  .tt-char.current  { color: #d1d0c5; }
-  .tt-char.extra    { color: #ca4754; font-size: 0.9em; }
+/* ── Top bar ── */
+.tt-topbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 50px;
+}
 
-  /* ── Caret ── */
-  .tt-char.current::before {
-    content: '';
-    position: absolute;
-    left: -1px;
-    top: 4px;
-    bottom: 4px;
-    width: 2px;
-    background: #e2b714;
-    border-radius: 2px;
-    animation: blink 1s step-end infinite;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0; }
-  }
-    
-  /* ── Hidden real input ── */
-  .tt-input {
-    position: absolute;
-    opacity: 0;
-    width: 1px;
-    height: 1px;
-    top: 0; left: 0;
-    pointer-events: none;
-  }
+.tt-brand {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e2b714;
+  letter-spacing: 1px;
+}
 
-  /* ── Click-to-focus hint ── */
-  .tt-focus-hint {
-    text-align: center;
-    margin-top: 18px;
-    font-size: 12px;
-    color: #3e4044;
-    letter-spacing: 1px;
-    transition: opacity 0.2s;
-  }
-  .tt-focus-hint.hidden { opacity: 0; }
+.tt-brand span {
+  color: #646669;
+  font-weight: 300;
+}
 
-  /* ── Progress bar ── */
-  .tt-progress-track {
-    width: 100%;
-    max-width: 820px;
-    height: 3px;
-    background: #3e4044;
-    border-radius: 2px;
-    margin-top: 18px;
-    overflow: hidden;
-  }
-  .tt-progress-fill {
-    height: 100%;
-    background: #e2b714;
-    border-radius: 2px;
-    transition: width 0.1s linear;
-  }
+/* ── Mode bar ── */
+.tt-modebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  /* ── Action buttons ── */
-  .tt-actions {
-    margin-top: 32px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
-  .tt-btn {
-    font-family: 'Roboto Mono', monospace;
-    font-size: 13px;
-    padding: 10px 22px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, transform 0.1s;
-    letter-spacing: 0.5px;
-  }
-  .tt-btn:active { transform: scale(0.97); }
-  .tt-btn-primary {
-    background: #e2b714;
-    color: #2c2e31;
-    font-weight: 700;
-  }
-  .tt-btn-primary:hover { background: #f0cc30; }
-  .tt-btn-ghost {
-    background: #3e4044;
-    color: #646669;
-  }
-  .tt-btn-ghost:hover { background: #4a4e54; color: #d1d0c5; }
+.tt-mode-btn {
+  background: none;
+  border: none;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 14px;
+  color: #646669;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
 
-  /* ── Results overlay ── */
-  .tt-results {
-    width: 100%;
-    max-width: 820px;
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .tt-results-title {
-    font-size: 13px;
-    color: #646669;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-  }
+.tt-mode-btn:hover {
+  color: #d1d0c5;
+  background: #3e4044;
+}
+
+.tt-mode-btn.active {
+  color: #e2b714;
+  background: #3e4044;
+}
+
+.tt-mode-sep {
+  color: #3e4044;
+  font-size: 16px;
+  user-select: none;
+}
+
+/* ── Stats ── */
+.tt-stats {
+  width: 100%;
+  display: flex;
+  gap: 50px;
+  margin-bottom: 30px;
+  min-height: 52px;
+  align-items: flex-end;
+}
+
+.tt-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.tt-stat-label {
+  font-size: 11px;
+  color: #646669;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.tt-stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #e2b714;
+  line-height: 1;
+}
+
+.tt-stat-value.dim {
+  color: #646669;
+}
+
+/* ── Typing Area ── */
+.tt-area {
+  width: 100%;
+  position: relative;
+  cursor: text;
+}
+
+/* ── Words ── */
+.tt-words {
+  font-size: 28px;
+  line-height: 2;
+  letter-spacing: 0.6px;
+
+  color: #646669;
+  user-select: none;
+
+  position: relative;
+  overflow: hidden;
+
+  max-height: calc(2em * 3);
+}
+
+.tt-words-inner {
+  transition: transform 0.15s ease;
+}
+
+/* ── Character states ── */
+.tt-char { position: relative; }
+
+.tt-char.correct  { color: #d1d0c5; }
+
+.tt-char.incorrect {
+  color: #ca4754;
+  text-decoration: underline;
+  text-decoration-color: #ca4754;
+}
+
+.tt-char.current  { color: #d1d0c5; }
+
+.tt-char.extra {
+  color: #ca4754;
+  font-size: 0.9em;
+}
+
+/* ── Caret ── */
+.tt-char.current::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: #e2b714;
+  border-radius: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Hidden input ── */
+.tt-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* ── Focus hint ── */
+.tt-focus-hint {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 12px;
+  color: #3e4044;
+  letter-spacing: 1px;
+  transition: opacity 0.2s;
+}
+
+.tt-focus-hint.hidden {
+  opacity: 0;
+}
+
+/* ── Progress bar ── */
+.tt-progress-track {
+  width: 100%;
+  height: 3px;
+  background: #3e4044;
+  border-radius: 2px;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+.tt-progress-fill {
+  height: 100%;
+  background: #e2b714;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+/* ── Buttons ── */
+.tt-actions {
+  margin-top: 32px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.tt-btn {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tt-btn:active {
+  transform: scale(0.97);
+}
+
+.tt-btn-primary {
+  background: #e2b714;
+  color: #2c2e31;
+  font-weight: 700;
+}
+
+.tt-btn-primary:hover {
+  background: #f0cc30;
+}
+
+.tt-btn-ghost {
+  background: #3e4044;
+  color: #646669;
+}
+
+.tt-btn-ghost:hover {
+  background: #4a4e54;
+  color: #d1d0c5;
+}
+
+/* ── Results ── */
+.tt-results {
+  width: 100%;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tt-results-title {
+  font-size: 13px;
+  color: #646669;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.tt-results-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 36px;
+}
+
+@media (max-width: 768px) {
   .tt-results-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 36px;
+    grid-template-columns: repeat(2, 1fr);
   }
-  @media (max-width: 600px) {
-    .tt-results-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  .tt-result-card {
-    background: #3e4044;
-    border-radius: 10px;
-    padding: 18px 20px;
-  }
-  .tt-result-card-label {
-    font-size: 11px;
-    color: #646669;
-    letter-spacing: 1.5px;
-    margin-bottom: 6px;
-  }
-  .tt-result-card-value {
-    font-size: 36px;
-    font-weight: 700;
-    color: #e2b714;
-    line-height: 1;
-  }
-  .tt-result-card-unit {
-    font-size: 12px;
-    color: #646669;
-    margin-top: 4px;
-  }
+}
 
-  /* ── Mistakes list ── */
-  .tt-mistakes-title {
-    font-size: 12px;
-    color: #646669;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-  .tt-mistakes-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 32px;
-  }
-  .tt-mistake-chip {
-    background: #3e4044;
-    border-radius: 6px;
-    padding: 5px 12px;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .tt-mistake-expected { color: #d1d0c5; }
-  .tt-mistake-arrow    { color: #646669; font-size: 10px; }
-  .tt-mistake-typed    { color: #ca4754; }
+.tt-result-card {
+  background: #3e4044;
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+
+.tt-result-card-label {
+  font-size: 11px;
+  color: #646669;
+}
+
+.tt-result-card-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #e2b714;
+}
+
+.tt-result-card-unit {
+  font-size: 12px;
+  color: #646669;
+}
+
+/* ── Mistakes ── */
+.tt-mistakes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tt-mistake-chip {
+  background: #3e4044;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 13px;
+  display: flex;
+  gap: 6px;
+}
+
+.tt-mistake-typed {
+  color: #ca4754;
+}
 `;
 
 function pickPrompt() {
