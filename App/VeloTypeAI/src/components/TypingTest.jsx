@@ -569,7 +569,7 @@ export default function TypingTest() {
             >
               ↺
             </button>
-            <button>Login</button>
+            <button onClick={() => {navigator("/login")}}>Login</button>
           </div>
         </div>
 
