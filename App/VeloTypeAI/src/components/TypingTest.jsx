@@ -1,4 +1,5 @@
 import {useState, useRef, useEffect, useCallback} from 'react'
+import {useNavigate} from 'react-router-dom'
 
 const SAMPLE_PROMPTS = [
   "the quick brown fox jumps over the lazy dog and runs across the open field under the bright morning sun",
@@ -369,6 +370,9 @@ function computeAccuracy(correct, total) {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function TypingTest() {
+
+  const navigator = useNavigate();
+
   const [prompt, setPrompt]           = useState(pickPrompt);
   const [typed, setTyped]             = useState("");
   const [started, setStarted]         = useState(false);
@@ -565,6 +569,7 @@ export default function TypingTest() {
             >
               ↺
             </button>
+            <button>Login</button>
           </div>
         </div>
 
