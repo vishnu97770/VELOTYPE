@@ -3,9 +3,12 @@ import '../assets/styles/login.css';
 
 import Footer from './footer.jsx'
 
+import {useNavigate} from 'react-router-dom'
+
 function Login()
 {
     const [rememberMe, setRememberMe] = useState(true);
+    const navigator = useNavigate();
 
     return (
         <div className="login-page">
@@ -21,11 +24,12 @@ function Login()
                         <span style={{ color: 'var(--sub-color)', fontSize: '0.8rem', display: 'block', marginBottom: '-0.3rem' }}>monkey see</span>
                         VeloTypeAI
                     </div>
-                    <div className="nav-icons" style={{ marginLeft: '1rem' }}>
+                    <div className="nav-icons" style={{ marginLeft: '1rem', display: "flex", alignItems: "baseline" }}>
                         <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 576 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M528 448H48c-26.51 0-48 21.49-48 48v32h576v-32c0-26.51-21.49-48-48-48zm48-320V48c0-26.51-21.49-48-48-48H48C21.49 0 0 21.49 0 48v80h576zm-128 48H128c-26.51 0-48 21.49-48 48v160c0 26.51 21.49 48 48 48h320c26.51 0 48-21.49 48-48V224c0-26.51-21.49-48-48-48zM176 352h-32v-32h32v32zm0-64h-32v-32h32v32zm64 64h-32v-32h32v32zm0-64h-32v-32h32v32zm64 64h-32v-32h32v32zm0-64h-32v-32h32v32zm64 64h-32v-32h32v32zm0-64h-32v-32h32v32zm64 64h-32v-32h32v32zm0-64h-32v-32h32v32z"></path></svg>
                         <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 640 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M528 448H112c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h416c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm64-320c-26.5 0-48 21.5-48 48 0 7.1 1.6 13.7 4.4 19.8L476 239.2c-15.4 9.2-35.3 4-44.5-11.5L320 48l-111.5 179.7c-9.2 15.5-29.1 20.7-44.5 11.5L95.6 187.8c2.8-6.1 4.4-12.7 4.4-19.8 0-26.5-21.5-48-48-48S4 141.5 4 168s21.5 48 48 48c2.6 0 5.2-.2 7.7-.6L112 376c0 13.3 10.7 24 24 24h368c13.3 0 24-10.7 24-24l52.3-160.6c2.5.4 5.1.6 7.7.6 26.5 0 48-21.5 48-48s-21.5-48-48-48z"></path></svg>
                         <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 192 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.239 0 24 32.239 24 72s32.239 72 72 72 72-32.239 72-72S135.761 0 96 0z"></path></svg>
                         <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M487.4 315.7l-42.6-24.6c2.3-10.7 3.7-21.8 3.7-33.1s-1.4-22.4-3.7-33.1l42.6-24.6c7.7-4.4 10.6-14.1 6.3-22.1L451.3 101c-4.3-8-13.9-10.9-22-6.5l-44.6 25.8c-14.7-12.8-31.4-22.8-49.8-29.4l4.1-13.2h-74c0 1.2.1 2.3.1 3.5v7.7c0 53-43 96-96 96s-96-43-96-96v-7.7c0-1.2.1-2.3.1-3.5h-74l4.1 13.2c-18.4 6.7-35.1 16.6-49.8 29.4l-44.6-25.8c-8.1-4.4-17.7-1.5-22 6.5l-42.4 73.5c-4.3 8-1.4 17.7 6.3 22.1l42.6 24.6c-2.3 10.7-3.7 21.8-3.7 33.1s1.4 22.4 3.7 33.1l-42.6 24.6c-7.7 4.4-10.6 14.1-6.3 22.1L60.7 411c4.3 8 13.9 10.9 22 6.5l44.6-25.8c14.7 12.8 31.4 22.8 49.8 29.4l-4.1 13.2h74c0-1.2-.1-2.3-.1-3.5v-7.7c0-53 43-96 96-96s96 43 96 96v7.7c0 1.2-.1 2.3-.1 3.5h74l-4.1-13.2c18.4-6.7 35.1-16.6 49.8-29.4l44.6 25.8c8.1 4.4 17.7 1.5 22-6.5l42.4-73.5c4.3-8 1.4-17.7-6.3-22.1zM256 336c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80z"></path></svg>
+                        <button onClick={() => {navigator("/")}}>TypingPage</button>
                     </div>
                 </div>
                 <div className="nav-icons">
