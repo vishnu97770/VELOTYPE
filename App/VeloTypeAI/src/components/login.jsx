@@ -20,6 +20,55 @@ function Login()
     const [registerError,   setRegisterError]   = useState('');
     const [registerSuccess, setRegisterSuccess] = useState('');
     const [registerLoading, setRegisterLoading] = useState(false);
+    
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setRegisterError('');
+        setRegisterSuccess('');
+
+        // Client-side validation
+        if (registerData.email !== registerData.verifyEmail) {
+            setRegisterError('Emails do not match.');
+            return;
+        }
+        if (registerData.password !== registerData.verifyPassword) {
+            setRegisterError('Passwords do not match.');
+            return;
+        }
+        if (registerData.password.length < 6) {
+            setRegisterError('Password must be at least 6 characters.');
+            return;
+        }
+
+        setRegisterLoading(true);
+        try {
+            const res = await fetch('http://localhost:8000/api/v1/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: registerData.username,
+                    email:    registerData.email,
+                    password: registerData.password,
+                }),
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.detail || 'Registration failed.');
+            }
+
+            setRegisterSuccess('Account created! You can now log in.');
+            setRegisterData({
+                username: '', email: '', verifyEmail: '',
+                password: '', verifyPassword: '',
+            });
+        } catch (err) {
+            setRegisterError(err.message || 'Registration failed. Please try again.');
+        } finally {
+            setRegisterLoading(false);
+        }
+    };
 
     return (
         <div className="login-page">
