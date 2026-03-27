@@ -10,6 +10,17 @@ function Login()
     const [rememberMe, setRememberMe] = useState(true);
     const navigator = useNavigate();
 
+    const [registerData, setRegisterData] = useState({
+        username: '',
+        email: '',
+        verifyEmail: '',
+        password: '',
+        verifyPassword: '',
+    });
+    const [registerError,   setRegisterError]   = useState('');
+    const [registerSuccess, setRegisterSuccess] = useState('');
+    const [registerLoading, setRegisterLoading] = useState(false);
+
     return (
         <div className="login-page">
             <header>
