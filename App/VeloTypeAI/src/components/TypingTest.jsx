@@ -58,11 +58,6 @@ const styles = `
   letter-spacing: 1px;
 }
 
-.tt-brand span {
-  color: #646669;
-  font-weight: 300;
-}
-
 /* ── Mode bar ── */
 .tt-modebar {
   display: flex;
@@ -484,7 +479,7 @@ export default function TypingTest() {
         <style>{styles}</style>
         <div className="tt-page">
           <div className="tt-topbar">
-            <div className="tt-brand">velo<span>type</span>AI</div>
+            <div className="tt-brand">Velo<span>Type</span>AI</div>
           </div>
 
           <div className="tt-results">
@@ -550,7 +545,7 @@ export default function TypingTest() {
 
         {/* Top bar */}
         <div className="tt-topbar">
-          <div className="tt-brand">velo<span>type</span>AI</div>
+          <div className="tt-brand">Velo<span>Type</span>AI</div>
           <div className="tt-modebar">
             {[15, 30, 60].map((t) => (
               <button
