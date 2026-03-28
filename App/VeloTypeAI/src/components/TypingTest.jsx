@@ -235,7 +235,7 @@ const styles = `
   margin-top: 32px;
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .tt-btn {
