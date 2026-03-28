@@ -104,6 +104,13 @@ def health_check():
         "environment": ENVIRONMENT,
 }
 
+@app.get("/api/v1/auth", tags=["AuthPage"])
+def auth_check():
+    return {
+        'status': 'ok',
+        'message': 'Hi mate!',
+    }
+
 
 # ──────────────────────────────────────────────
 #  Entry point (for running with `python main.py`)
