@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlmodel
+psycopg2-binary
+python-jose[cryptography]
+bcrypt
+python-dotenv
+httpx
+slowapi
+pydantic[email]
