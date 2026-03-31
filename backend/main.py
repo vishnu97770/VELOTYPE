@@ -63,10 +63,11 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS — restrict origins per environment
 allowed_origins = (
-["*"]
-if ENVIRONMENT == "development"
-else [FRONTEND_URL]
+    ["*"]
+    if ENVIRONMENT == "development"
+    else [origin.strip() for origin in FRONTEND_URL.split(",") if origin.strip()]
 )
+
 
 app.add_middleware(
 CORSMiddleware,

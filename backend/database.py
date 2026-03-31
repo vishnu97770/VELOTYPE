@@ -15,6 +15,10 @@ DATABASE_URL: str = os.getenv(
     "postgresql://postgres:password@localhost:5432/velotypeai",
 )
 
+# Fix for Render: SQLAlchemy expects postgresql:// but Render provides postgres://
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 # ──────────────────────────────────────────────
 #  Engine
 #
