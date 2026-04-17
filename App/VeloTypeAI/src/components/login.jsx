@@ -1,171 +1,336 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../assets/styles/login.css';
+import Footer from './footer.jsx';
+import { useNavigate } from 'react-router-dom';
 
-import Footer from './footer.jsx'
+const PARTICLES = Array.from({ length: 18 }).map((_, i) => ({
+  id: i,
+  size: Math.random() * 4 + 2,
+  left: Math.random() * 100,
+  delay: Math.random() * 18,
+  duration: Math.random() * 14 + 10,
+  gold: Math.random() > 0.5,
+}));
 
-import {useNavigate} from 'react-router-dom'
+function Login() {
+  const [rememberMe, setRememberMe] = useState(true);
+  const [activeTab, setActiveTab] = useState('login'); // 'login' | 'register'
+  const navigator = useNavigate();
 
-function Login()
-{
-    const [rememberMe, setRememberMe] = useState(true);
-    const navigator = useNavigate();
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loginError, setLoginError] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
-    const [registerData, setRegisterData] = useState({
-        username: '',
-        email: '',
-        verifyEmail: '',
-        password: '',
-        verifyPassword: '',
-    });
-    const [registerError,   setRegisterError]   = useState('');
-    const [registerSuccess, setRegisterSuccess] = useState('');
-    const [registerLoading, setRegisterLoading] = useState(false);
-    
+  const [registerData, setRegisterData] = useState({
+    username: '', email: '', verifyEmail: '', password: '', verifyPassword: '',
+  });
+  const [registerError, setRegisterError] = useState('');
+  const [registerSuccess, setRegisterSuccess] = useState('');
+  const [registerLoading, setRegisterLoading] = useState(false);
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
-        setRegisterError('');
-        setRegisterSuccess('');
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setRegisterError('');
+    setRegisterSuccess('');
 
-        // Client-side validation
-        if (registerData.email !== registerData.verifyEmail) {
-            setRegisterError('Emails do not match.');
-            return;
-        }
-        if (registerData.password !== registerData.verifyPassword) {
-            setRegisterError('Passwords do not match.');
-            return;
-        }
-        if (registerData.password.length < 6) {
-            setRegisterError('Password must be at least 6 characters.');
-            return;
-        }
+    if (registerData.email !== registerData.verifyEmail) {
+      setRegisterError('Emails do not match.');
+      return;
+    }
+    if (registerData.password !== registerData.verifyPassword) {
+      setRegisterError('Passwords do not match.');
+      return;
+    }
+    if (registerData.password.length < 6) {
+      setRegisterError('Password must be at least 6 characters.');
+      return;
+    }
 
-        setRegisterLoading(true);
-        try {
-            const res = await fetch('https://velotype-backend.onrender.com/api/v1/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: registerData.username,
-                    email:    registerData.email,
-                    password: registerData.password,
-                }),
-            });
+    setRegisterLoading(true);
+    try {
+      const res = await fetch('https://velotype-backend.onrender.com/api/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: registerData.username,
+          email: registerData.email,
+          password: registerData.password,
+        }),
+      });
 
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || 'Registration failed.');
-            }
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Registration failed.');
+      }
 
-            setRegisterSuccess('Account created! You can now log in.');
-            setRegisterData({
-                username: '', email: '', verifyEmail: '',
-                password: '', verifyPassword: '',
-            });
-        } catch (err) {
-            setRegisterError(err.message || 'Registration failed. Please try again.');
-        } finally {
-            setRegisterLoading(false);
-        }
-    };
+      setRegisterSuccess('Account created! You can now sign in.');
+      setRegisterData({ username: '', email: '', verifyEmail: '', password: '', verifyPassword: '' });
+      setTimeout(() => setActiveTab('login'), 1500);
+    } catch (err) {
+      setRegisterError(err.message || 'Registration failed. Try again.');
+    } finally {
+      setRegisterLoading(false);
+    }
+  };
 
-    return (
-        <div className="login-page">
-            <header>
-                <div className="logo-container">
-                    <div className="logo-icon">
-                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M432 96a48 48 0 1048 48 48 48 0 00-48-48zM302.59 217.16c-30-29.35-77.85-29-106.91 1s-28.71 78.69 1.25 108 77.85 29 106.91-1 28.71-78.69-1.25-108zM149.34 163a32 32 0 11-32 32 32 32 0 0132-32zm213.32 0a32 32 0 11-32 32 32 32 0 0132-32zM256 368c-44.18 0-80-48.42-80-64 0-11 8.95-20 20-20h120c11.05 0 20 8.95 20 20 0 15.58-35.82 64-80 64z"></path>
-                            <path d="M414.39 337.56c-19.14-19-19-49.79.28-68.59l41.6-40.59c19.33-18.86 19.33-49.44 0-68.3l-41.6-40.59c-19.14-19-19-49.79.28-68.59a48 48 0 00-67.73 0c-19.33 18.86-50.6 18.86-69.93 0a48 48 0 00-67.73 0c-19.14 19-50.41 19-69.55 0a48 48 0 00-67.73 0c-19.33 18.86-19.33 49.44 0 68.3l41.6 40.59c19.28 18.8 19.42 49.59.28 68.59l-41.6 40.59c-19.33 18.86-19.33 49.44 0 68.3l41.6 40.59c19.14 19 19 49.79-.28 68.59a48 48 0 0067.73 0c19.33-18.86 50.6-18.86 69.93 0a48 48 0 0067.73 0c19.14-19 50.41-19 69.55 0a48 48 0 0067.73 0c19.33-18.86 19.33-49.44 0-68.3z"></path>
-                        </svg>
-                    </div>
-                    <div className="logo-text">
-                        <span style={{ color: 'var(--sub-color)', fontSize: '0.8rem', display: 'block', marginBottom: '-0.3rem' }}>monkey see</span>
-                        VeloTypeAI
-                    </div>
-                    <div className="nav-icons" style={{ marginLeft: '1rem', display: "flex", alignItems: "baseline" }}>
-                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 576 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M528 448H48c-26.51 0-48 21.49-48 48v32h576v-32c0-26.51-21.49-48-48-48zm48-320V48c0-26.51-21.49-48-48-48H48C21.49 0 0 21.49 0 48v80h576zm-128 48H128c-26.51 0-48 21.49-48 48v160c0 26.51 21.49 48 48 48h320c26.51 0 48-21.49 48-48V224c0-26.51-21.49-48-48-48zM176 352h-32v-32h32v32zm0-64h-32v-32h32v32zm64 64h-32v-32h32v32zm0-64h-32v-32h32v32zm64 64h-32v-32h32v32zm0-64h-32v-32h32v32zm64 64h-32v-32h32v32zm0-64h-32v-32h32v32zm64 64h-32v-32h32v32zm0-64h-32v-32h32v32z"></path></svg>
-                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 640 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M528 448H112c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h416c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm64-320c-26.5 0-48 21.5-48 48 0 7.1 1.6 13.7 4.4 19.8L476 239.2c-15.4 9.2-35.3 4-44.5-11.5L320 48l-111.5 179.7c-9.2 15.5-29.1 20.7-44.5 11.5L95.6 187.8c2.8-6.1 4.4-12.7 4.4-19.8 0-26.5-21.5-48-48-48S4 141.5 4 168s21.5 48 48 48c2.6 0 5.2-.2 7.7-.6L112 376c0 13.3 10.7 24 24 24h368c13.3 0 24-10.7 24-24l52.3-160.6c2.5.4 5.1.6 7.7.6 26.5 0 48-21.5 48-48s-21.5-48-48-48z"></path></svg>
-                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 192 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.239 0 24 32.239 24 72s32.239 72 72 72 72-32.239 72-72S135.761 0 96 0z"></path></svg>
-                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M487.4 315.7l-42.6-24.6c2.3-10.7 3.7-21.8 3.7-33.1s-1.4-22.4-3.7-33.1l42.6-24.6c7.7-4.4 10.6-14.1 6.3-22.1L451.3 101c-4.3-8-13.9-10.9-22-6.5l-44.6 25.8c-14.7-12.8-31.4-22.8-49.8-29.4l4.1-13.2h-74c0 1.2.1 2.3.1 3.5v7.7c0 53-43 96-96 96s-96-43-96-96v-7.7c0-1.2.1-2.3.1-3.5h-74l4.1 13.2c-18.4 6.7-35.1 16.6-49.8 29.4l-44.6-25.8c-8.1-4.4-17.7-1.5-22 6.5l-42.4 73.5c-4.3 8-1.4 17.7 6.3 22.1l42.6 24.6c-2.3 10.7-3.7 21.8-3.7 33.1s1.4 22.4 3.7 33.1l-42.6 24.6c-7.7 4.4-10.6 14.1-6.3 22.1L60.7 411c4.3 8 13.9 10.9 22 6.5l44.6-25.8c14.7 12.8 31.4 22.8 49.8 29.4l-4.1 13.2h74c0-1.2-.1-2.3-.1-3.5v-7.7c0-53 43-96 96-96s96 43 96 96v7.7c0 1.2-.1 2.3-.1 3.5h74l-4.1-13.2c18.4-6.7 35.1-16.6 49.8-29.4l44.6 25.8c8.1 4.4 17.7 1.5 22-6.5l42.4-73.5c4.3-8 1.4-17.7-6.3-22.1zM256 336c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80z"></path></svg>
-                        <button onClick={() => {navigator("/")}}>TypingPage</button>
-                    </div>
-                </div>
-                <div className="nav-icons">
-                    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z"></path></svg>
-                    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg>
-                </div>
-            </header>
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    setLoginSuccess('');
+    setLoginLoading(true);
+    try {
+      const res = await fetch('https://velotype-backend.onrender.com/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginData.email, password: loginData.password }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Login failed.');
+      }
+      setLoginSuccess('Welcome back! Redirecting…');
+      setTimeout(() => navigator('/'), 1200);
+    } catch (err) {
+      setLoginError(err.message || 'Login failed. Try again.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
-            <main>
-                <div className="form-column">
-                    <div className="column-title">
-                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4zM400 168h-48v-48c0-13.3-10.7-24-24-24s-24 10.7-24 24v48h-48c-13.3 0-24 10.7-24 24s10.7 24 24 24h48v48c0 13.3 10.7 24 24 24s24-10.7 24-24v-48h48c13.3 0 24-10.7 24-24s-10.7-24-24-24z"></path></svg>
-                        register
-                    </div>
-                    <form>
-                        <input type="text" placeholder="username" />
-                        <input type="email" placeholder="email" />
-                        <input type="email" placeholder="verify email" />
-                        <input type="password" placeholder="password" />
-                        <input type="password" placeholder="verify password" />
-                        <button type="submit" className="submit-btn" style={{ marginTop: '0' }}>
-                            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>
-                            sign up
-                        </button>
-                    </form>
-                </div>
+  return (
+    <div className="login-page">
+      {/* Animated background */}
+      <div className="login-bg-grid" />
+      {PARTICLES.map((p) => (
+        <div
+          key={p.id}
+          className="login-particle"
+          style={{
+            width: p.size,
+            height: p.size,
+            left: `${p.left}%`,
+            background: p.gold
+              ? `rgba(226,183,20,${Math.random() * 0.4 + 0.3})`
+              : `rgba(167,139,250,${Math.random() * 0.3 + 0.2})`,
+            boxShadow: p.gold
+              ? `0 0 ${p.size * 3}px rgba(226,183,20,0.6)`
+              : `0 0 ${p.size * 3}px rgba(167,139,250,0.5)`,
+            borderRadius: '50%',
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+          }}
+        />
+      ))}
 
-                <div className="form-column">
-                    <div className="column-title">
-                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L201 79c-15-15-41-4.5-41 17v96H24c-13.3 0-24 10.7-24 24v80c0 13.3 10.7 24 24 24h136v96c0 21.5 26 32 41 17l168-168c9.4-9.4 9.4-24.6 0-34z"></path></svg>
-                        login
-                    </div>
-                    <div className="social-login">
-                        <button className="social-btn">
-                            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 488 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
-                        </button>
-                        <button className="social-btn">
-                            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 496 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5.7 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-.7zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg>
-                        </button>
-                    </div>
-                    <div className="separator">or</div>
-                    <form>
-                        <input type="email" placeholder="email" />
-                        <input type="password" placeholder="password" />
-                        <div
-                            className={`remember-me ${rememberMe ? 'active' : ''}`}
-                            onClick={() => setRememberMe(!rememberMe)}
-                        >
-                            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path>
-                            </svg>
-                            remember me
-                        </div>
-                        <button type="submit" className="submit-btn" style={{ color: 'var(--text-color)' }}>
-                            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L201 79c-15-15-41-4.5-41 17v96H24c-13.3 0-24 10.7-24 24v80c0 13.3 10.7 24 24 24h136v96c0 21.5 26 32 41 17l168-168c9.4-9.4 9.4-24.6 0-34z"></path></svg>
-                            sign in
-                        </button>
-                        <a href="#" className="forgot-password">forgot password?</a>
-                    </form>
-                </div>
-            </main>
+      {/* Header */}
+      <header>
+        <div className="logo-container" onClick={() => navigator('/')}>
+          <div className="logo-icon">
+            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 640 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+              <path d="M528 448H112c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h416c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm64-320c-26.5 0-48 21.5-48 48 0 7.1 1.6 13.7 4.4 19.8L476 239.2c-15.4 9.2-35.3 4-44.5-11.5L320 48l-111.5 179.7c-9.2 15.5-29.1 20.7-44.5 11.5L95.6 187.8c2.8-6.1 4.4-12.7 4.4-19.8 0-26.5-21.5-48-48-48S4 141.5 4 168s21.5 48 48 48c2.6 0 5.2-.2 7.7-.6L112 376c0 13.3 10.7 24 24 24h368c13.3 0 24-10.7 24-24l52.3-160.6c2.5.4 5.1.6 7.7.6 26.5 0 48-21.5 48-48s-21.5-48-48-48z" />
+            </svg>
+          </div>
+          <div className="logo-text">VeloTypeAI</div>
+        </div>
 
-            <div className="shortcuts-footer">
-                <div className="shortcut">
-                    <span className="key">tab</span> + <span className="key">enter</span> - restart test
-                </div>
-                <div className="shortcut">
-                    <span className="key">esc</span> or <span className="key">cmd</span> + <span className="key">shift</span> + <span className="key">p</span> - command line
-                </div>
+        <div className="nav-icons">
+          <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" title="Notifications">
+            <path d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z" />
+          </svg>
+          <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" title="Profile">
+            <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" />
+          </svg>
+        </div>
+      </header>
+
+      {/* Tab switcher */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '8px',
+        padding: '32px 48px 0',
+        position: 'relative',
+        zIndex: 10,
+      }}>
+        {['login', 'register'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: '13px',
+              fontWeight: 700,
+              padding: '10px 28px',
+              borderRadius: '12px',
+              border: '1px solid',
+              cursor: 'pointer',
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+              transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              background: activeTab === tab
+                ? 'linear-gradient(135deg, rgba(226,183,20,0.15), rgba(226,183,20,0.08))'
+                : 'rgba(255,255,255,0.03)',
+              borderColor: activeTab === tab ? 'rgba(226,183,20,0.35)' : 'rgba(255,255,255,0.06)',
+              color: activeTab === tab ? '#e2b714' : '#646669',
+              boxShadow: activeTab === tab
+                ? '0 0 20px rgba(226,183,20,0.15), inset 0 1px 0 rgba(226,183,20,0.15)'
+                : 'none',
+              transform: activeTab === tab ? 'translateY(-2px)' : 'none',
+            }}
+          >
+            {tab === 'login' ? '→ Sign In' : '+ Register'}
+          </button>
+        ))}
+      </div>
+
+      {/* Main Forms */}
+      <main style={{ padding: '32px 48px' }}>
+        {/* LOGIN CARD */}
+        {activeTab === 'login' && (
+          <div className="form-column" style={{ width: '380px' }}>
+            <div className="column-title">
+              <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L201 79c-15-15-41-4.5-41 17v96H24c-13.3 0-24 10.7-24 24v80c0 13.3 10.7 24 24 24h136v96c0 21.5 26 32 41 17l168-168c9.4-9.4 9.4-24.6 0-34z" />
+              </svg>
+              Sign In
             </div>
 
-            <footer>
-                <Footer />
-            </footer>
+            <div className="social-login">
+              <button className="social-btn" title="Continue with Google">
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 488 512" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
+                </svg>
+              </button>
+              <button className="social-btn" title="Continue with GitHub">
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 496 512" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8z" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="separator">or</div>
+
+            <form onSubmit={handleLogin}>
+              <input
+                type="email"
+                placeholder="email"
+                value={loginData.email}
+                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                required
+              />
+              <input
+                type="password"
+                placeholder="password"
+                value={loginData.password}
+                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                required
+              />
+
+              <div
+                className={`remember-me ${rememberMe ? 'active' : ''}`}
+                onClick={() => setRememberMe(!rememberMe)}
+              >
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z" />
+                </svg>
+                remember me
+              </div>
+
+              {loginError && <div className="form-msg error">{loginError}</div>}
+              {loginSuccess && <div className="form-msg success">{loginSuccess}</div>}
+
+              <button type="submit" className="submit-btn" disabled={loginLoading}>
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L201 79c-15-15-41-4.5-41 17v96H24c-13.3 0-24 10.7-24 24v80c0 13.3 10.7 24 24 24h136v96c0 21.5 26 32 41 17l168-168c9.4-9.4 9.4-24.6 0-34z" />
+                </svg>
+                <span>{loginLoading ? 'signing in…' : 'sign in'}</span>
+              </button>
+
+              <a href="#" className="forgot-password">forgot password?</a>
+            </form>
+          </div>
+        )}
+
+        {/* REGISTER CARD */}
+        {activeTab === 'register' && (
+          <div className="form-column" style={{ width: '380px' }}>
+            <div className="column-title">
+              <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4zM400 168h-48v-48c0-13.3-10.7-24-24-24s-24 10.7-24 24v48h-48c-13.3 0-24 10.7-24 24s10.7 24 24 24h48v48c0 13.3 10.7 24 24 24s24-10.7 24-24v-48h48c13.3 0 24-10.7 24-24s-10.7-24-24-24z" />
+              </svg>
+              Create Account
+            </div>
+
+            <form onSubmit={handleRegister}>
+              <input
+                type="text"
+                placeholder="username"
+                value={registerData.username}
+                onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
+                required
+              />
+              <input
+                type="email"
+                placeholder="email"
+                value={registerData.email}
+                onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                required
+              />
+              <input
+                type="email"
+                placeholder="verify email"
+                value={registerData.verifyEmail}
+                onChange={(e) => setRegisterData({ ...registerData, verifyEmail: e.target.value })}
+                required
+              />
+              <input
+                type="password"
+                placeholder="password"
+                value={registerData.password}
+                onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                required
+              />
+              <input
+                type="password"
+                placeholder="verify password"
+                value={registerData.verifyPassword}
+                onChange={(e) => setRegisterData({ ...registerData, verifyPassword: e.target.value })}
+                required
+              />
+
+              {registerError && <div className="form-msg error">{registerError}</div>}
+              {registerSuccess && <div className="form-msg success">{registerSuccess}</div>}
+
+              <button type="submit" className="submit-btn" disabled={registerLoading} style={{ marginTop: '4px' }}>
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+                </svg>
+                <span>{registerLoading ? 'creating account…' : 'sign up'}</span>
+              </button>
+            </form>
+          </div>
+        )}
+      </main>
+
+      {/* Shortcuts */}
+      <div className="shortcuts-footer">
+        <div className="shortcut">
+          <span className="key">tab</span>
+          <span>+</span>
+          <span className="key">enter</span>
+          <span style={{ color: 'var(--sub2, #3e4044)' }}>restart test</span>
         </div>
-    );
-};
+        <div className="shortcut">
+          <span className="key">esc</span>
+          <span style={{ color: 'var(--sub2, #3e4044)' }}>command line</span>
+        </div>
+      </div>
+
+      <Footer />
+      
+    </div>
+  );
+}
 
 export default Login;
