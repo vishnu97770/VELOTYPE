@@ -19,9 +19,9 @@ const styles = `
 /* ── Page ── */
 .tt-page {
   font-family: 'Roboto Mono', monospace;
-  background-color: #2c2e31;
+  background-color: transparent;
 
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
 
   display: flex;
@@ -53,10 +53,7 @@ const styles = `
 }
 
 .tt-brand {
-  font-size: 22px;
-  font-weight: 700;
-  color: #e2b714;
-  letter-spacing: 1px;
+  display: none; /* Handled by Navbar now */
 }
 
 /* ── Mode bar ── */
@@ -67,15 +64,21 @@ const styles = `
 }
 
 .tt-mode-btn {
-  background: none;
-  border: none;
+  background: #242526;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3);
   font-family: 'Roboto Mono', monospace;
   font-size: 14px;
   color: #646669;
   cursor: pointer;
-  padding: 6px 14px;
-  border-radius: 6px;
-  transition: color 0.15s, background 0.15s;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: transform 0.1s, box-shadow 0.1s, color 0.15s, background 0.15s;
+}
+
+.tt-mode-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0px 0 rgba(0,0,0,0.3);
 }
 
 .tt-mode-btn:hover {
@@ -84,8 +87,10 @@ const styles = `
 }
 
 .tt-mode-btn.active {
-  color: #e2b714;
-  background: #3e4044;
+  color: var(--theme-main);
+  background: rgba(0, 240, 255, 0.1);
+  border-color: var(--theme-main);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
 }
 
 .tt-mode-sep {
@@ -107,6 +112,13 @@ const styles = `
 .tt-stat {
   display: flex;
   flex-direction: column;
+  background: rgba(36, 37, 38, 0.6);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 12px 20px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  min-width: 100px;
+  align-items: center;
 }
 
 .tt-stat-label {
@@ -119,7 +131,8 @@ const styles = `
 .tt-stat-value {
   font-size: 32px;
   font-weight: 700;
-  color: #e2b714;
+  color: var(--theme-main);
+  text-shadow: var(--theme-glow);
   line-height: 1;
 }
 
@@ -128,6 +141,28 @@ const styles = `
 }
 
 /* ── Typing Area ── */
+.tt-area-container {
+  width: 100%;
+  position: relative;
+  background: rgba(36, 37, 38, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  margin-top: 20px;
+  /* Glowing bottom border effect */
+  border-bottom: 2px solid rgba(0, 240, 255, 0.2);
+  transition: border-bottom-color 0.3s, box-shadow 0.3s;
+}
+
+.tt-area-container:focus-within {
+  border-bottom-color: var(--theme-main);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05), var(--theme-glow);
+}
+
 .tt-area {
   width: 100%;
   position: relative;
@@ -179,8 +214,9 @@ const styles = `
   top: 4px;
   bottom: 4px;
   width: 2px;
-  background: #e2b714;
+  background: var(--theme-main);
   border-radius: 2px;
+  box-shadow: var(--theme-glow);
   animation: blink 1s step-end infinite;
 }
 
@@ -226,8 +262,9 @@ const styles = `
 
 .tt-progress-fill {
   height: 100%;
-  background: #e2b714;
+  background: linear-gradient(90deg, var(--theme-secondary), var(--theme-main));
   border-radius: 2px;
+  box-shadow: var(--theme-glow);
   transition: width 0.1s linear;
 }
 
@@ -244,23 +281,32 @@ const styles = `
   font-size: 13px;
   padding: 10px 22px;
   border-radius: 8px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.15s, color 0.15s;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 5px 10px rgba(0,0,0,0.2);
 }
 
 .tt-btn:active {
-  transform: scale(0.97);
+  transform: translateY(4px);
+  box-shadow: 0 0px 0 rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .tt-btn-primary {
-  background: #e2b714;
-  color: #2c2e31;
+  background: var(--theme-main);
+  color: #0b0f19;
   font-weight: 700;
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 4px 0 rgba(0, 150, 160, 0.5), 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.tt-btn-primary:active {
+  box-shadow: 0 0px 0 rgba(0, 150, 160, 0.5), 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .tt-btn-primary:hover {
-  background: #f0cc30;
+  background: #33f3ff;
+  box-shadow: 0 4px 0 rgba(0, 150, 160, 0.5), var(--theme-glow);
 }
 
 .tt-btn-ghost {
@@ -319,7 +365,8 @@ const styles = `
 .tt-result-card-value {
   font-size: 36px;
   font-weight: 700;
-  color: #e2b714;
+  color: var(--theme-main);
+  text-shadow: var(--theme-glow);
 }
 
 .tt-result-card-unit {
@@ -452,7 +499,7 @@ export default function TypingTest() {
 
   // ── Render character with correct state ──
   const renderChars = () => {
-    return promptChars.map((char, i) => {
+    const chars = promptChars.map((char, i) => {
       let cls = "tt-char";
       if (i < typed.length) {
         cls += typed[i] === char ? " correct" : " incorrect";
@@ -465,6 +512,22 @@ export default function TypingTest() {
         </span>
       );
     });
+
+    // Mock AI Prediction Ghost Text
+    if (started && !finished && typed.length > 5 && typed.length < promptChars.length - 10) {
+      // Find the next 3 words to "predict"
+      const remainingText = prompt.slice(typed.length);
+      const nextWords = remainingText.split(' ').slice(0, 3).join(' ');
+      if (nextWords) {
+        chars.push(
+          <span key="ai-prediction" style={{ color: 'rgba(0, 240, 255, 0.4)', pointerEvents: 'none' }}>
+            {nextWords} <span style={{fontSize: '10px', verticalAlign: 'super', color: 'rgba(138, 43, 226, 0.8)'}}>✦ AI</span>
+          </span>
+        );
+      }
+    }
+
+    return chars;
   };
 
   // ── Results screen ──
@@ -568,27 +631,12 @@ export default function TypingTest() {
             </button>
             {isLoggedIn ? (
               <>
-                <span style={{ color: '#e2b714', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ color: 'var(--theme-main)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="0.9em" width="0.9em" xmlns="http://www.w3.org/2000/svg"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg>
                   {user?.username}
                 </span>
-                <button
-                  className="tt-mode-btn"
-                  onClick={(e) => { e.stopPropagation(); logout(); }}
-                  style={{ color: '#ca4754' }}
-                >
-                  logout
-                </button>
               </>
-            ) : (
-              <button
-                className="tt-mode-btn"
-                style={{ background: '#e2b714', color: '#2c2e31', fontWeight: '700', borderRadius: '6px', padding: '6px 16px' }}
-                onClick={(e) => { e.stopPropagation(); navigator('/login'); }}
-              >
-                Sign In
-              </button>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -616,27 +664,29 @@ export default function TypingTest() {
           </div>
         </div>
 
-        {/* Words display */}
-        <div className="tt-area" onClick={focusInput}>
-          <div className="tt-words">
-            <div className="tt-words-inner">
-              {renderChars()}
+        {/* Words display inside a 3D container */}
+        <div className="tt-area-container" onClick={focusInput}>
+          <div className="tt-area">
+            <div className="tt-words">
+              <div className="tt-words-inner">
+                {renderChars()}
+              </div>
             </div>
-          </div>
 
-          {/* Hidden real input that captures keystrokes */}
-          <input
-            ref={inputRef}
-            className="tt-input"
-            value={typed}
-            onChange={handleInput}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck="false"
-          />
+            {/* Hidden real input that captures keystrokes */}
+            <input
+              ref={inputRef}
+              className="tt-input"
+              value={typed}
+              onChange={handleInput}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
+            />
+          </div>
         </div>
 
         {/* Progress bar */}

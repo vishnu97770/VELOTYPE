@@ -127,7 +127,7 @@ function Login() {
             </svg>
           </div>
           <div className="logo-text">
-            <span style={{ color: 'var(--sub-color)', fontSize: '0.8rem', display: 'block', marginBottom: '-0.3rem' }}>monkey see</span>
+            <span style={{ color: 'var(--sub-color)', fontSize: '0.8rem', display: 'block', marginBottom: '-0.3rem' }}>AI powered</span>
             VeloTypeAI
           </div>
         </div>
