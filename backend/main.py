@@ -61,12 +61,17 @@ lifespan=lifespan,
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS — restrict origins per environment
-allowed_origins = (
-    ["*"]
-    if ENVIRONMENT == "development"
-    else [origin.strip() for origin in FRONTEND_URL.split(",") if origin.strip()]
-)
+# CORS — credentials require explicit origins (never wildcard with credentials:include)
+# Build allowed origins list from FRONTEND_URL env var plus common dev origins
+_dev_origins = [
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:4173",
+]
+_prod_origins = [o.strip() for o in FRONTEND_URL.split(",") if o.strip()]
+
+allowed_origins = list(set(_dev_origins + _prod_origins))
 
 
 app.add_middleware(

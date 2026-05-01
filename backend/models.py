@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import Column, Text, ARRAY, UniqueConstraint
+from sqlalchemy import Column, Text, JSON, UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -229,7 +229,7 @@ class PracticeTask(PracticeTaskBase, table=True):
     )
     user_id:     uuid.UUID = Field(foreign_key="users.user_id", nullable=False, index=True)
     # Stored as a PostgreSQL TEXT[] array
-    focus_words: List[str] = Field(default=[], sa_column=Column(ARRAY(Text), nullable=False))
+    focus_words: List[str] = Field(default=[], sa_column=Column(JSON, nullable=False))
     created_at:  datetime  = Field(default_factory=now_utc, nullable=False)
 
     # ── Relationships ──
