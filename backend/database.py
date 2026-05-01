@@ -12,7 +12,7 @@ load_dotenv()
 
 DATABASE_URL: str = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:password@localhost:5432/velotypeai",
+    "sqlite:///./velotypeai.db",
 )
 
 # Fix for Render: SQLAlchemy expects postgresql:// but Render provides postgres://
@@ -26,15 +26,30 @@ if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
 #  pool_size      – number of persistent connections kept open
 #  max_overflow   – extra connections allowed above pool_size under load
 #  echo           – set True locally to log every SQL statement
+#
+#  SQLite note: pool_size and max_overflow are not supported with
+#  the StaticPool used for SQLite, so we use connect_args instead.
 # ──────────────────────────────────────────────
 
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-    echo=os.getenv("DB_ECHO", "false").lower() == "true",
-)
+_is_sqlite = DATABASE_URL.startswith("sqlite")
+_echo      = os.getenv("DB_ECHO", "false").lower() == "true"
+
+if _is_sqlite:
+    # SQLite: lightweight, no connection pooling needed — perfect for local dev
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False},
+        echo=_echo,
+    )
+else:
+    # PostgreSQL (production on Render or any PG host)
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_size=10,
+        max_overflow=20,
+        echo=_echo,
+    )
 
 # ──────────────────────────────────────────────
 #  Table initialisation

@@ -4,12 +4,51 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #0b0f19;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --theme-bg: #0b0f19;
+  --theme-main: #00f0ff;
+  --theme-secondary: #8a2be2;
+  --theme-panel: rgba(15, 23, 42, 0.6);
+  --theme-shadow-light: rgba(0, 240, 255, 0.1);
+  --theme-shadow-dark: rgba(0, 0, 0, 0.6);
+  --theme-glow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+a {
+  font-weight: 500;
+  color: var(--theme-main);
+  text-decoration: inherit;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+a:hover {
+  color: #fff;
+  text-shadow: var(--theme-glow);
 }
 
 html, body, #root {
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
+  /* Grid background */
+  background-color: var(--theme-bg);
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center center;
 }
 
 body {
@@ -45,4 +84,32 @@ a {
 ::selection {
   background: rgba(226,183,20,0.25);
   color: #fff;
+  transition: all 0.25s ease;
+  color: #00f0ff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Base 3D button effect class */
+.btn-3d {
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 5px 10px rgba(0,0,0,0.2);
+}
+.btn-3d:active {
+  transform: translateY(4px);
+  box-shadow: 0 0px 0 rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Base floating container class */
+.floating-container {
+  background: rgba(36, 37, 38, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
