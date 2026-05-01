@@ -29,7 +29,7 @@ const styles = `
     color: #d1d0c5;
   }
   .security-header-brand span {
-    color: #e2b714;
+    color: #00f0ff;
     font-weight: 700;
   }
 
@@ -58,9 +58,9 @@ const styles = `
     margin-bottom: 4px;
   }
   .security-toc ul li a {
-    color: #e2b714;
+    color: #00f0ff;
     text-decoration: underline;
-    text-decoration-color: rgba(226,183,20,0.5);
+    text-decoration-color: rgba(0,240,255,0.5);
     transition: color 0.15s;
   }
   .security-toc ul li a:hover {
@@ -75,7 +75,7 @@ const styles = `
     font-family: 'Roboto Mono', monospace;
     font-size: 22px;
     font-weight: 700;
-    color: #e2b714;
+    color: #00f0ff;
     margin-bottom: 20px;
     margin-top: 0;
   }
@@ -84,9 +84,9 @@ const styles = `
     margin-bottom: 16px;
   }
   .security-section a {
-    color: #e2b714;
+    color: #00f0ff;
     text-decoration: underline;
-    text-decoration-color: rgba(226,183,20,0.45);
+    text-decoration-color: rgba(0,240,255,0.45);
   }
   .security-section a:hover {
     color: #f0d050;
@@ -136,7 +136,7 @@ function Security() {
             <rect x="22" y="14" width="6" height="6" rx="1" fill="#d1d0c5" />
             <rect x="30" y="14" width="6" height="6" rx="1" fill="#d1d0c5" />
             <rect x="6"  y="22" width="6" height="6" rx="1" fill="#d1d0c5" />
-            <rect x="14" y="22" width="6" height="6" rx="1" fill="#e2b714" />
+            <rect x="14" y="22" width="6" height="6" rx="1" fill="#00f0ff" />
             <rect x="22" y="22" width="6" height="6" rx="1" fill="#d1d0c5" />
             <rect x="30" y="22" width="6" height="6" rx="1" fill="#d1d0c5" />
             <rect x="10" y="30" width="22" height="6" rx="1" fill="#d1d0c5" />

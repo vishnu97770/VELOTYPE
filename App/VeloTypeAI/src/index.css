@@ -62,7 +62,7 @@ button {
   background-color: #3E4044;
   cursor: pointer;
   transition: all 0.25s ease;
-  color: #E2B714;
+  color: #00f0ff;
 }
 button:focus,
 button:focus-visible {
