@@ -352,6 +352,16 @@ import React, { useState, useEffect } from 'react';
 import '../assets/styles/login.css';
 import Footer from './footer.jsx';
 import { useNavigate } from 'react-router-dom';
+
+const PARTICLES = Array.from({ length: 18 }).map((_, i) => ({
+  id: i,
+  size: Math.random() * 4 + 2,
+  left: Math.random() * 100,
+  delay: Math.random() * 18,
+  duration: Math.random() * 14 + 10,
+  gold: Math.random() > 0.5,
+}));
+
 import apiClient from '../apiClient.js';
 
 const PARTICLES = Array.from({ length: 18 }).map((_, i) => ({
@@ -368,6 +378,7 @@ function Login() {
   const [activeTab, setActiveTab] = useState('login'); // 'login' | 'register'
   const navigator = useNavigate();
 
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [loginData, setLoginData] = useState({ usernameOrEmail: '', password: '' });
   const [loginError, setLoginError] = useState('');
   const [loginSuccess, setLoginSuccess] = useState('');
@@ -400,6 +411,9 @@ function Login() {
 
     setRegisterLoading(true);
     try {
+      const res = await fetch('https://velotype-backend.onrender.com/api/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
       await apiClient('/auth/register', {
         method: 'POST',
         body: JSON.stringify({
@@ -408,6 +422,11 @@ function Login() {
           password: registerData.password,
         }),
       });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Registration failed.');
+      }
 
       setRegisterSuccess('Account created! You can now sign in.');
       setRegisterData({ username: '', email: '', verifyEmail: '', password: '', verifyPassword: '' });
@@ -425,6 +444,17 @@ function Login() {
     setLoginSuccess('');
     setLoginLoading(true);
     try {
+      const res = await fetch('https://velotype-backend.onrender.com/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginData.email, password: loginData.password }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Login failed.');
+      }
+      setLoginSuccess('Welcome back! Redirecting…');
+      setTimeout(() => navigator('/'), 1200);
       const data = await apiClient('/auth/login', {
         method: 'POST',
         body: JSON.stringify({
@@ -458,6 +488,11 @@ function Login() {
             width: p.size,
             height: p.size,
             left: `${p.left}%`,
+            background: p.gold
+              ? `rgba(226,183,20,${Math.random() * 0.4 + 0.3})`
+              : `rgba(167,139,250,${Math.random() * 0.3 + 0.2})`,
+            boxShadow: p.gold
+              ? `0 0 ${p.size * 3}px rgba(226,183,20,0.6)`
             background: p.cyan
               ? `rgba(0,240,255,${Math.random() * 0.4 + 0.3})`
               : `rgba(167,139,250,${Math.random() * 0.3 + 0.2})`,
@@ -517,6 +552,12 @@ function Login() {
               textTransform: 'uppercase',
               transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
               background: activeTab === tab
+                ? 'linear-gradient(135deg, rgba(226,183,20,0.15), rgba(226,183,20,0.08))'
+                : 'rgba(255,255,255,0.03)',
+              borderColor: activeTab === tab ? 'rgba(226,183,20,0.35)' : 'rgba(255,255,255,0.06)',
+              color: activeTab === tab ? '#e2b714' : '#646669',
+              boxShadow: activeTab === tab
+                ? '0 0 20px rgba(226,183,20,0.15), inset 0 1px 0 rgba(226,183,20,0.15)'
                 ? 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,240,255,0.08))'
                 : 'rgba(255,255,255,0.03)',
               borderColor: activeTab === tab ? 'rgba(0,240,255,0.35)' : 'rgba(255,255,255,0.06)',
@@ -561,6 +602,10 @@ function Login() {
 
             <form onSubmit={handleLogin}>
               <input
+                type="email"
+                placeholder="email"
+                value={loginData.email}
+                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                 type="text"
                 placeholder="username or email"
                 value={loginData.usernameOrEmail}
@@ -676,6 +721,7 @@ function Login() {
       </div>
 
       <Footer />
+      
 
     </div>
   );

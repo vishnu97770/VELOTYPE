@@ -1,3 +1,5 @@
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 // import {useState, useRef, useEffect, useCallback} from 'react'
 // import {useNavigate} from 'react-router-dom'
 // import { useAuth } from '../context/AuthContext.jsx'
@@ -735,6 +737,9 @@ const styles = `
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
+  --gold: #e2b714;
+  --gold-light: #f5cd2f;
+  --gold-glow: rgba(226,183,20,0.55);
   --cyan: #00f0ff;
   --cyan-light: #33f3ff;
   --cyan-glow: rgba(0,240,255,0.55);
@@ -767,6 +772,7 @@ const styles = `
   position: absolute;
   inset: 0;
   background:
+    radial-gradient(ellipse 70% 55% at 15% 15%, rgba(226,183,20,0.18) 0%, transparent 60%),
     radial-gradient(ellipse 70% 55% at 15% 15%, rgba(0,240,255,0.18) 0%, transparent 60%),
     radial-gradient(ellipse 60% 50% at 85% 80%, rgba(130,80,255,0.16) 0%, transparent 60%),
     radial-gradient(ellipse 50% 40% at 50% 110%, rgba(202,71,84,0.12) 0%, transparent 60%),
@@ -799,6 +805,25 @@ const styles = `
   90% { opacity: 0.6; }
   100% { transform: translateY(-10vh) rotate(720deg) scale(1.2); opacity: 0; }
 }
+
+/* Grid lines */
+.tt-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(226,183,20,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(226,183,20,0.07) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridMove 18s linear infinite;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+
+@keyframes gridMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(60px); }
+}
+
 
 /* Grid lines */
 .tt-grid {
@@ -848,6 +873,7 @@ const styles = `
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   justify-content: flex-end;
   padding: 28px 0 24px;
   position: relative;
@@ -860,6 +886,7 @@ const styles = `
   left: 0;
   right: 0;
   height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
   background: linear-gradient(90deg, transparent, var(--cyan-glow), transparent);
 }
 
@@ -869,12 +896,29 @@ const styles = `
   font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light), #fff5a0);
   background: linear-gradient(135deg, var(--cyan), var(--cyan-light), #fff5a0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   cursor: pointer;
   transition: transform 0.3s ease, filter 0.3s ease;
+  filter: drop-shadow(0 0 20px var(--gold-glow));
+  transform-style: preserve-3d;
+}
+
+.tt-brand:hover {
+  transform: scale(1.05) translateZ(10px);
+  filter: drop-shadow(0 0 30px var(--gold-glow)) brightness(1.1);
+}
+
+.tt-brand span {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
   filter: drop-shadow(0 0 20px var(--cyan-glow));
   transform-style: preserve-3d;
 }
@@ -923,6 +967,7 @@ const styles = `
   content: '';
   position: absolute;
   inset: 0;
+  background: linear-gradient(135deg, var(--gold-glow), transparent);
   background: linear-gradient(135deg, var(--cyan-glow), transparent);
   opacity: 0;
   transition: opacity 0.2s;
@@ -937,6 +982,11 @@ const styles = `
 .tt-mode-btn:hover::before { opacity: 0.3; }
 
 .tt-mode-btn.active {
+  color: var(--gold);
+  background: rgba(226,183,20,0.18);
+  box-shadow: 0 0 20px rgba(226,183,20,0.35), 0 0 8px rgba(226,183,20,0.2), inset 0 1px 0 rgba(226,183,20,0.3);
+  transform: translateY(-1px);
+  text-shadow: 0 0 12px rgba(226,183,20,0.6);
   color: var(--cyan);
   background: rgba(0,240,255,0.18);
   box-shadow: 0 0 20px rgba(0,240,255,0.35), 0 0 8px rgba(0,240,255,0.2), inset 0 1px 0 rgba(0,240,255,0.3);
@@ -956,18 +1006,21 @@ const styles = `
   font-size: 13px !important;
   font-weight: 600 !important;
   padding: 8px 20px !important;
+  background: linear-gradient(135deg, var(--gold), #f5a623) !important;
   background: linear-gradient(135deg, var(--cyan), #00c0cc) !important;
   color: #1a1b1e !important;
   border-radius: 10px !important;
   border: none !important;
   cursor: pointer !important;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  box-shadow: 0 4px 15px rgba(226,183,20,0.3) !important;
   box-shadow: 0 4px 15px rgba(0,240,255,0.3) !important;
   letter-spacing: 0.3px !important;
 }
 
 .tt-login-btn:hover {
   transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 8px 25px rgba(226,183,20,0.5) !important;
   box-shadow: 0 8px 25px rgba(0,240,255,0.5) !important;
   filter: brightness(1.1) !important;
 }
@@ -1004,6 +1057,24 @@ const styles = `
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(226,183,20,0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tt-stat:hover {
+  transform: translateY(-5px) rotateX(6deg);
+  border-color: rgba(226,183,20,0.3);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 30px rgba(226,183,20,0.15);
+}
+
+}
+
+.tt-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
   background: linear-gradient(90deg, transparent, rgba(0,240,255,0.4), transparent);
   opacity: 0;
   transition: opacity 0.3s;
@@ -1028,6 +1099,10 @@ const styles = `
   font-family: 'Outfit', sans-serif;
   font-size: 30px;
   font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 24px rgba(226,183,20,0.8), 0 0 48px rgba(226,183,20,0.3);
   color: var(--cyan);
   line-height: 1;
   transition: all 0.3s ease;
@@ -1083,6 +1158,7 @@ const styles = `
   left: 10%;
   right: 10%;
   height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(226,183,20,0.8), rgba(200,150,255,0.5), rgba(226,183,20,0.8), transparent);
   background: linear-gradient(90deg, transparent, rgba(0,240,255,0.8), rgba(200,150,255,0.5), rgba(0,240,255,0.8), transparent);
   filter: blur(1px);
 }
@@ -1092,12 +1168,18 @@ const styles = `
   content: '';
   position: absolute;
   inset: 0;
+  background: radial-gradient(ellipse 50% 40% at var(--mx, 50%) var(--my, 50%), rgba(226,183,20,0.07) 0%, transparent 70%);
   background: radial-gradient(ellipse 50% 40% at var(--mx, 50%) var(--my, 50%), rgba(0,240,255,0.07) 0%, transparent 70%);
   pointer-events: none;
   transition: background 0.15s;
 }
 
 .tt-card.focused {
+  border-color: rgba(226,183,20,0.25);
+  box-shadow:
+    0 24px 80px rgba(0,0,0,0.65),
+    0 0 60px rgba(226,183,20,0.12),
+    0 0 0 1px rgba(226,183,20,0.18),
   border-color: rgba(0,240,255,0.25);
   box-shadow:
     0 24px 80px rgba(0,0,0,0.65),
@@ -1153,6 +1235,9 @@ const styles = `
   top: 5px;
   bottom: 5px;
   width: 2px;
+  background: var(--gold);
+  border-radius: 2px;
+  box-shadow: 0 0 12px var(--gold-glow), 0 0 30px rgba(226,183,20,0.5), 0 0 60px rgba(226,183,20,0.2);
   background: var(--cyan);
   border-radius: 2px;
   box-shadow: 0 0 12px var(--cyan-glow), 0 0 30px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.2);
@@ -1160,6 +1245,7 @@ const styles = `
 }
 
 @keyframes caretBlink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 12px var(--gold-glow), 0 0 30px rgba(226,183,20,0.5); }
   0%, 100% { opacity: 1; box-shadow: 0 0 12px var(--cyan-glow), 0 0 30px rgba(0,240,255,0.5); }
   50% { opacity: 0; box-shadow: none; }
 }
@@ -1188,6 +1274,10 @@ const styles = `
 
 .tt-progress-fill {
   height: 100%;
+  background: linear-gradient(90deg, rgba(226,183,20,0.6), var(--gold), var(--gold-light));
+  border-radius: 4px;
+  transition: width 0.15s linear;
+  box-shadow: 0 0 14px rgba(226,183,20,0.8), 0 0 30px rgba(226,183,20,0.4);
   background: linear-gradient(90deg, rgba(0,240,255,0.6), var(--cyan), var(--cyan-light));
   border-radius: 4px;
   transition: width 0.15s linear;
@@ -1202,6 +1292,9 @@ const styles = `
   top: -4px;
   width: 11px;
   height: 11px;
+  background: var(--gold-light);
+  border-radius: 50%;
+  box-shadow: 0 0 14px rgba(226,183,20,0.9), 0 0 30px rgba(226,183,20,0.6);
   background: var(--cyan-light);
   border-radius: 50%;
   box-shadow: 0 0 14px rgba(0,240,255,0.9), 0 0 30px rgba(0,240,255,0.6);
@@ -1273,6 +1366,15 @@ const styles = `
 .tt-btn:active { transform: scale(0.96) !important; }
 
 .tt-btn-primary {
+  background: linear-gradient(135deg, #f5c518, var(--gold), #e09800);
+  color: #111214;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(226,183,20,0.4), 0 1px 0 rgba(255,255,255,0.15) inset;
+  border: 1px solid rgba(226,183,20,0.4);
+}
+.tt-btn-primary:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 10px 40px rgba(226,183,20,0.6), 0 0 20px rgba(226,183,20,0.3);
   background: linear-gradient(135deg, #00f0ff, var(--cyan), #00c0cc);
   color: #111214;
   font-weight: 700;
@@ -1293,6 +1395,11 @@ const styles = `
   -webkit-backdrop-filter: blur(20px);
 }
 .tt-btn-ghost:hover {
+  color: var(--gold);
+  border-color: rgba(226,183,20,0.3);
+  transform: translateY(-3px) scale(1.02);
+  background: rgba(226,183,20,0.06);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 15px rgba(226,183,20,0.1);
   color: var(--cyan);
   border-color: rgba(0,240,255,0.3);
   transform: translateY(-3px) scale(1.02);
@@ -1363,6 +1470,7 @@ const styles = `
   left: 0;
   right: 0;
   height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
   background: linear-gradient(90deg, transparent, var(--cyan-glow), transparent);
 }
 
@@ -1378,6 +1486,8 @@ const styles = `
 
 .tt-result-card:hover {
   transform: translateY(-6px) rotateX(5deg) rotateY(2deg);
+  border-color: rgba(226,183,20,0.2);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 30px rgba(226,183,20,0.1);
   border-color: rgba(0,240,255,0.2);
   box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 30px rgba(0,240,255,0.1);
 }
@@ -1394,11 +1504,13 @@ const styles = `
   font-size: 42px;
   font-weight: 800;
   font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
   background: linear-gradient(135deg, var(--cyan), var(--cyan-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
+  filter: drop-shadow(0 0 10px var(--gold-glow));
   filter: drop-shadow(0 0 10px var(--cyan-glow));
 }
 
@@ -1414,6 +1526,11 @@ const styles = `
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
+  background: rgba(226,183,20,0.1);
+  border: 1px solid rgba(226,183,20,0.2);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--gold);
   background: rgba(0,240,255,0.1);
   border: 1px solid rgba(0,240,255,0.2);
   border-radius: 20px;
@@ -1464,6 +1581,11 @@ const styles = `
   background: rgba(202,71,84,0.2);
   transform: translateY(-2px);
 }
+}
+.tt-mistake-chip:hover {
+  background: rgba(202,71,84,0.2);
+  transform: translateY(-2px);
+}
 .tt-mistake-expected { color: var(--text); }
 .tt-mistake-arrow { color: var(--sub2); }
 .tt-mistake-typed { color: var(--red); }
@@ -1502,6 +1624,7 @@ const styles = `
 .tt-ripple {
   position: absolute;
   border-radius: 50%;
+  background: rgba(226,183,20,0.15);
   background: rgba(0,240,255,0.15);
   transform: scale(0);
   animation: ripple 0.6s ease-out forwards;
@@ -1521,6 +1644,9 @@ const styles = `
   font-family: 'Outfit', sans-serif;
   font-size: 14px;
   font-weight: 700;
+  color: var(--gold);
+  background: rgba(226,183,20,0.1);
+  border: 1px solid rgba(226,183,20,0.2);
   color: var(--cyan);
   background: rgba(0,240,255,0.1);
   border: 1px solid rgba(0,240,255,0.2);
@@ -1536,6 +1662,7 @@ const styles = `
   display: block;
   font-size: 28px;
   line-height: 1;
+  text-shadow: 0 0 20px var(--gold-glow);
   text-shadow: 0 0 20px var(--cyan-glow);
 }
 `;
@@ -1556,6 +1683,77 @@ function computeAccuracy(correct, total) {
   return Math.round((correct / total) * 100);
 }
 
+function getPerformanceLabel(wpm) {
+  if (wpm >= 120) return '⚡ Lightning';
+  if (wpm >= 90) return '🔥 Expert';
+  if (wpm >= 60) return '🚀 Fast';
+  if (wpm >= 40) return '✨ Good';
+  if (wpm >= 20) return '📈 Improving';
+  return '🌱 Beginner';
+}
+
+// Animated particle background
+function Particles() {
+  return (
+    <div className="tt-particles">
+      {Array.from({ length: PARTICLES_COUNT }).map((_, i) => {
+        const size = Math.random() * 4 + 2;
+        const left = Math.random() * 100;
+        const delay = Math.random() * 15;
+        const duration = Math.random() * 15 + 10;
+        const gold = Math.random() > 0.5;
+        return (
+          <div
+            key={i}
+            className="tt-particle"
+            style={{
+              width: size,
+              height: size,
+              left: `${left}%`,
+              background: gold
+                ? `rgba(226,183,20,${Math.random() * 0.5 + 0.3})`
+                : `rgba(200,150,255,${Math.random() * 0.4 + 0.2})`,
+              animationDelay: `${delay}s`,
+              animationDuration: `${duration}s`,
+              boxShadow: gold
+                ? `0 0 ${size * 3}px rgba(226,183,20,0.6)`
+                : `0 0 ${size * 3}px rgba(200,150,255,0.5)`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+export default function TypingTest() {
+  const navigator = useNavigate();
+
+  const [prompt, setPrompt]       = useState(pickPrompt);
+  const [typed, setTyped]         = useState('');
+  const [started, setStarted]     = useState(false);
+  const [finished, setFinished]   = useState(false);
+  const [elapsed, setElapsed]     = useState(0);
+  const [focused, setFocused]     = useState(false);
+  const [timeLimit, setTimeLimit] = useState(60);
+  const [combo, setCombo]         = useState(0);
+  const [showCombo, setShowCombo] = useState(false);
+  const [mousePos, setMousePos]   = useState({ x: 50, y: 50 });
+
+  const inputRef  = useRef(null);
+  const timerRef  = useRef(null);
+  const startedAt = useRef(null);
+  const cardRef   = useRef(null);
+  const comboTimer = useRef(null);
+
+  const promptChars = prompt.split('');
+  const typedChars  = typed.split('');
+
+  const correctCount = typedChars.filter((c, i) => c === promptChars[i]).length;
+  const wpm       = computeWPM(correctCount, elapsed);
+  const accuracy  = computeAccuracy(correctCount, typedChars.length);
+  const progress  = Math.min((typed.length / prompt.length) * 100, 100);
+  const timeLeft  = Math.max(timeLimit - elapsed, 0);
 function buildSessionMistakes(promptChars, typedChars) {
   const mistakes = [];
   const total = Math.max(promptChars.length, typedChars.length);
@@ -1774,6 +1972,7 @@ export default function TypingTest() {
 
   const reset = useCallback((newPrompt = null) => {
     clearInterval(timerRef.current);
+    setPrompt(newPrompt || pickPrompt());
     setTyped('');
     setStarted(false);
     setFinished(false);
@@ -1810,6 +2009,14 @@ export default function TypingTest() {
       innerRef.current.style.transform = 'translateY(0)';
     }
   }, [typed]);
+
+  const renderChars = () => promptChars.map((char, i) => {
+    let cls = 'tt-char';
+    if (i < typed.length) cls += typed[i] === char ? ' correct' : ' incorrect';
+    else if (i === typed.length) cls += ' current';
+    return <span key={i} className={cls}>{char}</span>;
+  });
+
 
   useEffect(() => {
     if (!finished || submittedSessionRef.current) return;
@@ -1869,6 +2076,8 @@ export default function TypingTest() {
           <div className="tt-container">
             {/* Top Bar */}
             <div className="tt-topbar">
+              <div className="tt-brand" onClick={() => reset()}>Velo<span>Type</span>AI</div>
+              <div className="tt-modebar">
               <div className="tt-modebar">
                 <span className="tt-mode-sep" style={{ margin: '0 8px', color: 'var(--cyan)', fontSize: '12px' }}>
                   {promptMeta.aiGenerated ? 'gemini prompt' : 'local prompt'}
@@ -1921,6 +2130,9 @@ export default function TypingTest() {
                 <button className="tt-btn tt-btn-ghost" onClick={() => reset(prompt)}>
                   Retry
                 </button>
+                <button className="tt-btn tt-btn-ghost" onClick={() => navigator('/login')}>
+                  Sign In
+                </button>
               </div>
 
               <div className="tt-shortcut-row">
@@ -1963,6 +2175,7 @@ export default function TypingTest() {
 
           {/* Top Bar */}
           <div className="tt-topbar">
+            <div className="tt-brand">Velo<span>Type</span>AI</div>
             <div className="tt-modebar">
               {[
                 { label: '15s', val: 15 },
@@ -1978,6 +2191,12 @@ export default function TypingTest() {
                 </button>
               ))}
               <span className="tt-mode-sep">|</span>
+              <button className="tt-mode-btn" onClick={(e) => { e.stopPropagation(); reset(); }} title="New prompt">
+                ↺
+              </button>
+              <button className="tt-login-btn" onClick={() => navigator('/login')} style={{ marginLeft: '4px' }}>
+                Sign In
+              </button>
               <span className="tt-mode-sep" style={{ color: 'var(--cyan)', fontSize: '12px' }}>
                 {promptLoading ? 'loading…' : promptMeta.aiGenerated ? 'gemini' : 'local'}
               </span>
@@ -2050,6 +2269,7 @@ export default function TypingTest() {
 
           {/* Focus hint */}
           <p className={`tt-focus-hint ${focused ? 'hidden' : ''}`}>
+            click or press any key to focus
             {promptMessage || 'click or press any key to focus'}
           </p>
 
