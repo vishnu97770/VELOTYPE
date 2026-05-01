@@ -1,5 +1,6 @@
 import {useState, useRef, useEffect, useCallback} from 'react'
 import {useNavigate} from 'react-router-dom'
+import { useAuth } from '../context/AuthContext.jsx'
 
 const SAMPLE_PROMPTS = [
   "the quick brown fox jumps over the lazy dog and runs across the open field under the bright morning sun",
@@ -367,6 +368,7 @@ function computeAccuracy(correct, total) {
 export default function TypingTest() {
 
   const navigator = useNavigate();
+  const { user, logout, isLoggedIn } = useAuth();
 
   const [prompt, setPrompt]           = useState(pickPrompt);
   const [typed, setTyped]             = useState("");
@@ -564,7 +566,29 @@ export default function TypingTest() {
             >
               ↺
             </button>
-            <button onClick={() => {navigator("/login")}}>Login</button>
+            {isLoggedIn ? (
+              <>
+                <span style={{ color: '#e2b714', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="0.9em" width="0.9em" xmlns="http://www.w3.org/2000/svg"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg>
+                  {user?.username}
+                </span>
+                <button
+                  className="tt-mode-btn"
+                  onClick={(e) => { e.stopPropagation(); logout(); }}
+                  style={{ color: '#ca4754' }}
+                >
+                  logout
+                </button>
+              </>
+            ) : (
+              <button
+                className="tt-mode-btn"
+                style={{ background: '#e2b714', color: '#2c2e31', fontWeight: '700', borderRadius: '6px', padding: '6px 16px' }}
+                onClick={(e) => { e.stopPropagation(); navigator('/login'); }}
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </div>
 
