@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const { isLoggedIn, user, logout } = useAuth();
+  const navigator = useNavigate();
 
   return (
     <nav style={styles.navbar}>
