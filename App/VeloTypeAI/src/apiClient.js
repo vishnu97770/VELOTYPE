@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "https://velotype-backend.onrender.com/api/v1"
+const BASE_URL = import.meta.env.VITE_API_URL || "https://velotype-2-jn34.onrender.com/api/v1"
 const apiClient = async (endpoint, options = {}) => {
   const token = localStorage.getItem("access_token");
 

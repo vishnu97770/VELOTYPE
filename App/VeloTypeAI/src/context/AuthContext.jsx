@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://velotype-backend.onrender.com/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://velotype-2-jn34.onrender.com/api/v1';
 
 // ── Fetch with timeout (handles Render cold-start delays) ──────────────────────
 async function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
