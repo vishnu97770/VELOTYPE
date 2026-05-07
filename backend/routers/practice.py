@@ -1,5 +1,6 @@
 import os
 import random
+import uuid
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -22,7 +23,10 @@ router = APIRouter()
 
 TOP_K_PATTERNS  = 5    # how many of the worst patterns to target per task
 AI_MODEL        = "claude-sonnet-4-20250514"
-AI_MAX_TOKENS   = 300
+GEMINI_MODEL    = "gemini-2.5-flash"   # Correct working model for this API key
+GEMINI_MODEL_PATH = "models/gemini-2.5-flash"  # Full path required for v1beta
+AI_MAX_TOKENS   = 512
+
 
 # ──────────────────────────────────────────────
 #  Rule-Based Sentence Templates
@@ -67,6 +71,7 @@ def generate_rule_based(focus_words: List[str]) -> str:
 async def generate_ai_paragraph(
     focus_words: List[str],
     difficulty:  str,
+    word_count:  int = 50,
 ) -> tuple[str, bool]:
     """
     Returns (content, ai_generated).
@@ -75,17 +80,34 @@ async def generate_ai_paragraph(
     """
     import httpx
 
-    api_key = os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 
     if not api_key:
         # No API key configured — use rule-based
         return generate_rule_based(focus_words), False
 
-    words_joined = ", ".join(focus_words)
+
+    # ── Step 2: Build Frequency Weighted Prompt ──
+    from collections import Counter
+    counts = Counter(focus_words)
+    
+    # Identify "high priority" words (those appearing multiple times)
+    high_priority = [word for word, count in counts.items() if count > 1]
+    all_unique = list(counts.keys())
+    
+    words_joined = ", ".join(all_unique)
+    priority_note = ""
+    if high_priority:
+        priority_note = (
+            f" CRITICAL: The user is consistently failing on these characters/words: {', '.join(high_priority)}. "
+            f"You MUST repeat these specific characters/words MULTIPLE TIMES throughout the paragraph "
+            f"to force the user to practice them repeatedly."
+        )
+
     prompt = (
-        f"Generate a single, natural, coherent paragraph of approximately 50 words "
+        f"Generate a single, natural, coherent paragraph of approximately {word_count} words "
         f"for a typing practice exercise. The paragraph MUST naturally include all of "
-        f"the following words: {words_joined}. "
+        f"the following words: {words_joined}.{priority_note} "
         f"Difficulty level: {difficulty}. "
         f"Return only the paragraph text — no titles, no explanations, no bullet points."
     )
@@ -132,8 +154,33 @@ async def generate_ai_paragraph(
                 content = data["choices"][0]["message"]["content"].strip()
                 return content, True
 
-    except Exception:
-        # Any failure → silently fall back to rule-based
+        # ── Try Gemini (Google) ──
+        if os.getenv("GOOGLE_API_KEY"):
+            async with httpx.AsyncClient(timeout=20.0) as client:
+                response = await client.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/{GEMINI_MODEL_PATH}:generateContent?key={os.getenv('GOOGLE_API_KEY')}",
+                    headers={"Content-Type": "application/json"},
+                    json={
+                        "contents": [{
+                            "parts": [{"text": prompt}]
+                        }],
+                        "generationConfig": {
+                            "maxOutputTokens": AI_MAX_TOKENS,
+                            "temperature": 0.7,
+                        }
+                    },
+                )
+                response.raise_for_status()
+                data    = response.json()
+                content = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                # Strip any markdown or extra newlines
+                content = content.replace('\n', ' ').strip()
+                return content, True
+
+
+    except Exception as e:
+        # Log but fall back gracefully
+        print(f"[generate_ai_paragraph] AI call failed: {type(e).__name__}: {e}")
         pass
 
     return generate_rule_based(focus_words), False
@@ -151,6 +198,15 @@ class GeneratePracticeRequest(BaseModel):
 
 class GeneratePracticeResponse(PracticeTaskRead):
     pass
+
+
+class DailyTaskRequest(BaseModel):
+    focus_words:         List[str]
+    repetition_count:    int
+    difficulty:          str = "medium"
+    original_session_id: Optional[uuid.UUID] = None
+    is_assessment:       bool = False
+    word_count:          int = 50
 
 
 # ──────────────────────────────────────────────
@@ -223,6 +279,51 @@ async def generate_practice(
 
 
 # ──────────────────────────────────────────────
+#  POST /daily-task
+#  Create a specific practice task (e.g. for repetitions)
+# ──────────────────────────────────────────────
+
+@router.post(
+    "/daily-task",
+    response_model=PracticeTaskRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a custom practice task with repetitions",
+)
+async def create_daily_task(
+    body:         DailyTaskRequest,
+    current_user: User    = Depends(get_current_user),
+    session:      Session = Depends(get_session),
+) -> PracticeTaskRead:
+    """
+    Creates a practice task with a specific repetition count.
+    Used when a user clicks 'Add to Daily Task' after a session.
+    """
+    # Generate content
+    content, ai_generated = await generate_ai_paragraph(
+        body.focus_words, 
+        body.difficulty, 
+        word_count=body.word_count
+    )
+
+    new_task = PracticeTask(
+        user_id             = current_user.user_id,
+        content             = content,
+        focus_words         = body.focus_words,
+        difficulty          = body.difficulty,
+        ai_generated        = ai_generated,
+        repetition_count    = body.repetition_count,
+        completed_count     = 0,
+        is_assessment       = body.is_assessment,
+        original_session_id = body.original_session_id,
+    )
+    session.add(new_task)
+    session.commit()
+    session.refresh(new_task)
+
+    return new_task
+
+
+# ──────────────────────────────────────────────
 #  GET /history
 #  Get all previously generated practice tasks
 # ──────────────────────────────────────────────
@@ -252,3 +353,66 @@ def get_practice_history(
     ).all()
 
     return tasks
+
+
+# ──────────────────────────────────────────────
+#  GET /next
+#  Get the next recommended practice task
+# ──────────────────────────────────────────────
+
+@router.get(
+    "/next",
+    response_model=PracticeTaskRead,
+    summary="Get the next recommended practice task",
+)
+async def get_next_practice(
+    current_user: User    = Depends(get_current_user),
+    session:      Session = Depends(get_session),
+) -> PracticeTaskRead:
+    """
+    Returns the most recent practice task, or generates a new one
+    if the user has patterns but no tasks.
+    """
+    # 1. Fetch newest task
+    task = session.exec(
+        select(PracticeTask)
+        .where(PracticeTask.user_id == current_user.user_id)
+        .order_by(PracticeTask.created_at.desc())
+    ).first()
+
+    if task:
+        return task
+
+    # 2. No task? Try to generate one from patterns
+    patterns = session.exec(
+        select(MistakePattern)
+        .where(
+            MistakePattern.user_id   == current_user.user_id,
+            MistakePattern.is_active == True,
+        )
+        .order_by(MistakePattern.mistake_count.desc())
+        .limit(TOP_K_PATTERNS)
+    ).all()
+
+    if not patterns:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No pending practice",
+        )
+
+    # Generate on the fly
+    focus_words = [p.word for p in patterns]
+    content, ai_generated = await generate_ai_paragraph(focus_words, "medium")
+
+    new_task = PracticeTask(
+        user_id      = current_user.user_id,
+        content      = content,
+        focus_words  = focus_words,
+        difficulty   = "medium",
+        ai_generated = ai_generated,
+    )
+    session.add(new_task)
+    session.commit()
+    session.refresh(new_task)
+
+    return new_task

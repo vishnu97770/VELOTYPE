@@ -13,6 +13,7 @@ from models import (
     TypingSession,
     TypingSessionCreate,
     TypingSessionRead,
+    PracticeTask,
     User,
 )
 from routers.auth import get_current_user
@@ -38,7 +39,8 @@ class MistakeInput(BaseModel):
  
 class CreateSessionRequest(BaseModel):
     """Full payload for submitting a completed typing session."""
-    prompt_id:      uuid.UUID
+    prompt_id:      Optional[uuid.UUID] = None
+    task_id:        Optional[uuid.UUID] = None
     wpm:            float
     accuracy:       float
     duration_seconds: int
@@ -83,6 +85,7 @@ def create_session(
     new_session = TypingSession(
         user_id=current_user.user_id,
         prompt_id=body.prompt_id,
+        task_id=body.task_id,
         wpm=body.wpm,
         accuracy=body.accuracy,
         duration_seconds=body.duration_seconds,
@@ -119,6 +122,14 @@ def create_session(
         user_id=current_user.user_id,
         session=session,
     )
+
+    # ── Step 4: Handle Practice Task progress ──
+    if body.task_id:
+        task = session.get(PracticeTask, body.task_id)
+        if task and task.user_id == current_user.user_id:
+            task.completed_count += 1
+            session.add(task)
+            session.commit()
  
     # ── Step 4: Return session + mistakes ──
     return SessionDetailRead(

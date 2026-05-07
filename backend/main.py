@@ -18,6 +18,7 @@ load_dotenv()
 
 ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
 FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
+GEMINI_API_KEY: str = os.getenv("FETCH_PARAGRAPGH", "AIzaSyAQtaUcsg5LaBDw3DNEScN8Yudr19o1A9M")
 
 # ──────────────────────────────────────────────
 #  Rate Limiter

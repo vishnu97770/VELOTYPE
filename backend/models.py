@@ -110,7 +110,8 @@ class TypingSession(TypingSessionBase, table=True):
         nullable=False,
     )
     user_id:       uuid.UUID      = Field(foreign_key="users.user_id",   nullable=False, index=True)
-    prompt_id:     uuid.UUID      = Field(foreign_key="prompts.prompt_id", nullable=False)
+    prompt_id:     Optional[uuid.UUID] = Field(default=None, foreign_key="prompts.prompt_id", nullable=True)
+    task_id:       Optional[uuid.UUID] = Field(default=None, foreign_key="practice_tasks.task_id", nullable=True)
     raw_typed_text: Optional[str] = Field(default=None, sa_column=Column(Text))
     created_at:    datetime       = Field(default_factory=now_utc, nullable=False)
 
@@ -120,14 +121,16 @@ class TypingSession(TypingSessionBase, table=True):
     mistakes: List["Mistake"] = Relationship(back_populates="session")
 
 class TypingSessionCreate(TypingSessionBase):
-    prompt_id:      uuid.UUID
+    prompt_id:      Optional[uuid.UUID] = None
+    task_id:        Optional[uuid.UUID] = None
     raw_typed_text: Optional[str] = None
 
 
 class TypingSessionRead(TypingSessionBase):
     session_id:     uuid.UUID
     user_id:        uuid.UUID
-    prompt_id:      uuid.UUID
+    prompt_id:      Optional[uuid.UUID]
+    task_id:        Optional[uuid.UUID]
     raw_typed_text: Optional[str]
     created_at:     datetime
 
@@ -232,6 +235,12 @@ class PracticeTask(PracticeTaskBase, table=True):
     focus_words: List[str] = Field(default=[], sa_column=Column(JSON, nullable=False))
     created_at:  datetime  = Field(default_factory=now_utc, nullable=False)
 
+    # ── New Progress Tracking Fields ──
+    repetition_count:    int = Field(default=1, nullable=False)
+    completed_count:     int = Field(default=0, nullable=False)
+    is_assessment:       bool = Field(default=False, nullable=False)
+    original_session_id: Optional[uuid.UUID] = Field(default=None, foreign_key="typing_sessions.session_id")
+
     # ── Relationships ──
     user: "User" = Relationship(back_populates="practice_tasks")
 
@@ -241,8 +250,12 @@ class PracticeTaskCreate(PracticeTaskBase):
 
 
 class PracticeTaskRead(PracticeTaskBase):
-    task_id:     uuid.UUID
-    user_id:     uuid.UUID
-    focus_words: List[str]
-    created_at:  datetime
+    task_id:             uuid.UUID
+    user_id:             uuid.UUID
+    focus_words:         List[str]
+    created_at:          datetime
+    repetition_count:    int
+    completed_count:     int
+    is_assessment:       bool
+    original_session_id: Optional[uuid.UUID]
     
