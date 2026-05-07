@@ -71,8 +71,11 @@ _dev_origins = [
     "http://127.0.0.1:4173",
 ]
 _prod_origins = [o.strip() for o in FRONTEND_URL.split(",") if o.strip()]
+_prod_origins.append("https://velotype-three.vercel.app")
+_prod_origins.append("https://velotype-2-jn34.onrender.com")
 
 allowed_origins = list(set(_dev_origins + _prod_origins))
+
 
 
 app.add_middleware(
