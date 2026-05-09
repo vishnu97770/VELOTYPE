@@ -23,7 +23,7 @@ router = APIRouter()
 #  JWT Config
 # ──────────────────────────────────────────────
 
-SECRET_KEY: str           = os.getenv("JWT_SECRET_KEY", "changeme-use-a-long-random-secret")
+SECRET_KEY: str           = os.getenv("SECRET_KEY", "changeme-use-a-long-random-secret")
 ALGORITHM: str            = "HS256"
 ACCESS_TOKEN_EXPIRE_MIN   = 15    # 15 minutes
 REFRESH_TOKEN_EXPIRE_DAYS = 7     # 7 days
@@ -62,7 +62,6 @@ def verify_password(plain: str, hashed: str) -> bool:
     """Check a plain-text password against its bcrypt hash."""
     return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
 
-
 # ──────────────────────────────────────────────
 #  JWT Helpers
 # ──────────────────────────────────────────────
@@ -98,13 +97,23 @@ def decode_token(token: str) -> TokenData:
             detail="Token is invalid or has expired.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-
 # ──────────────────────────────────────────────
 #  Current User Dependency
 #  Use in any protected route:
 #  current_user: User = Depends(get_current_user)
 # ──────────────────────────────────────────────
+
+def get_user_from_token(token: str, session: Session) -> Optional[User]:
+    """Authenticate from a raw token string — used by WebSocket endpoints."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+        return session.exec(select(User).where(User.user_id == uuid.UUID(user_id))).first()
+    except Exception:
+        return None
+
 
 def get_current_user(
     token:   str     = Depends(oauth2_scheme),
@@ -123,8 +132,6 @@ def get_current_user(
             detail="User not found.",
         )
     return user
-
-
 # ──────────────────────────────────────────────
 #  POST /register
 # ──────────────────────────────────────────────
@@ -207,7 +214,7 @@ def login(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=os.getenv("ENVIRONMENT", "development") != "development",
+        secure=os.getenv("ENVIRONMENT", "production") == "production",
         samesite="lax",
         max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,  # seconds
     )

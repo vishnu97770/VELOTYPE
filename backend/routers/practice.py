@@ -22,27 +22,9 @@ router = APIRouter()
 # ──────────────────────────────────────────────
 
 TOP_K_PATTERNS  = 5    # how many of the worst patterns to target per task
-AI_MODEL        = "claude-sonnet-4-20250514"
-GEMINI_MODEL    = "gemini-2.5-flash"   # Correct working model for this API key
-GEMINI_MODEL_PATH = "models/gemini-2.5-flash"  # Full path required for v1beta
+GEMINI_MODEL      = "gemini-2.5-flash"
+GEMINI_MODEL_PATH = "models/gemini-2.5-flash"
 AI_MAX_TOKENS   = 512
-
-
-# ──────────────────────────────────────────────
-#  Rule-Based Sentence Templates
-#  {word} is replaced with each focus word
-# ──────────────────────────────────────────────
-
-TEMPLATES = [
-    "Please type the following word carefully: {word}.",
-    "Focus on typing {word} correctly every single time.",
-    "The word {word} requires your full attention.",
-    "Practice makes perfect when typing {word} repeatedly.",
-    "Try not to make a mistake when you type {word}.",
-    "Make sure you spell {word} accurately without hesitation.",
-    "The key to improvement is mastering words like {word}.",
-    "Take your time and type {word} with precision.",
-]
 
 
 # ──────────────────────────────────────────────
@@ -51,14 +33,23 @@ TEMPLATES = [
 
 def generate_rule_based(focus_words: List[str]) -> str:
     """
-    Build a practice paragraph by injecting each focus word
-    into a randomly chosen sentence template.
+    Build a practice paragraph by injecting focus words
+    into a randomly chosen paragraph template.
     """
-    sentences = []
-    for word in focus_words:
-        template = random.choice(TEMPLATES)
-        sentences.append(template.format(word=word))
-    return " ".join(sentences)
+    words_joined = ", ".join(focus_words) if focus_words else "various keys"
+    
+    paragraphs = [
+        f"To improve your typing speed, you must practice consistently. Pay special attention to the characters that trip you up, such as {words_joined}. By focusing on accuracy first, your speed will naturally increase over time. Remember to keep your hands relaxed and maintain a steady rhythm.",
+        
+        f"Every typist has specific keys they find challenging. For you, focusing on {words_joined} will yield the biggest improvements. Try to type these characters slowly and deliberately until the muscle memory becomes second nature. Practice makes perfect, so keep going and stay patient.",
+        
+        f"Typing is all about muscle memory and rhythm. If you find yourself making mistakes on {words_joined}, take a deep breath and slow down. It is much better to type accurately at a slower pace than to type fast with many errors. Keep your eyes on the screen and trust your fingers.",
+        
+        f"Mastering the keyboard takes time and dedication. Characters like {words_joined} might seem tricky now, but with repeated practice, they will become easy. Always aim for a smooth, continuous flow of keystrokes rather than rushing. Consistency is the key to becoming a proficient typist.",
+        
+        f"The digital age requires us to communicate quickly and effectively. When you struggle with {words_joined}, it disrupts your flow. Take this opportunity to reinforce your technique. Keep your wrists elevated, use all your fingers, and type with confidence. You are making great progress."
+    ]
+    return random.choice(paragraphs)
 
 
 # ──────────────────────────────────────────────
@@ -69,9 +60,13 @@ def generate_rule_based(focus_words: List[str]) -> str:
 # ──────────────────────────────────────────────
 
 async def generate_ai_paragraph(
-    focus_words: List[str],
-    difficulty:  str,
-    word_count:  int = 50,
+    focus_words:      List[str],
+    difficulty:       str,
+    word_count:       int = 50,
+    with_punctuation: bool = False,
+    with_numbers:     bool = False,
+    with_quotes:      bool = False,
+    custom_topic:     Optional[str] = None,
 ) -> tuple[str, bool]:
     """
     Returns (content, ai_generated).
@@ -80,7 +75,8 @@ async def generate_ai_paragraph(
     """
     import httpx
 
-    api_key = os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    # api_key = os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY") or os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 
     if not api_key:
         # No API key configured — use rule-based
@@ -104,61 +100,73 @@ async def generate_ai_paragraph(
             f"to force the user to practice them repeatedly."
         )
 
+    modifier_notes = []
+    if with_punctuation:
+        modifier_notes.append("Include natural punctuation marks (commas, periods, semicolons, colons, dashes) throughout the text.")
+    if with_numbers:
+        modifier_notes.append("Include some numeric digits (e.g. years, quantities, statistics) naturally in the text.")
+    if with_quotes:
+        modifier_notes.append("Include direct speech or quoted phrases using quotation marks (\") so the typist practises typing quote characters.")
+    if custom_topic:
+        modifier_notes.append(f"The paragraph should be about or relate to: {custom_topic}.")
+    modifier_str = " ".join(modifier_notes)
+
     prompt = (
         f"Generate a single, natural, coherent paragraph of approximately {word_count} words "
         f"for a typing practice exercise. The paragraph MUST naturally include all of "
         f"the following words: {words_joined}.{priority_note} "
         f"Difficulty level: {difficulty}. "
+        f"{modifier_str} "
         f"Return only the paragraph text — no titles, no explanations, no bullet points."
     )
 
     try:
         # ── Try Claude (Anthropic) first ──
-        if os.getenv("ANTHROPIC_API_KEY"):
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                response = await client.post(
-                    "https://api.anthropic.com/v1/messages",
-                    headers={
-                        "x-api-key":         os.getenv("ANTHROPIC_API_KEY"),
-                        "anthropic-version": "2023-06-01",
-                        "content-type":      "application/json",
-                    },
-                    json={
-                        "model":      AI_MODEL,
-                        "max_tokens": AI_MAX_TOKENS,
-                        "messages":   [{"role": "user", "content": prompt}],
-                    },
-                )
-                response.raise_for_status()
-                data    = response.json()
-                content = data["content"][0]["text"].strip()
-                return content, True
+        # if os.getenv("ANTHROPIC_API_KEY"):
+        #     async with httpx.AsyncClient(timeout=10.0) as client:
+        #         response = await client.post(
+        #             "https://api.anthropic.com/v1/messages",
+        #             headers={
+        #                 "x-api-key":         os.getenv("ANTHROPIC_API_KEY"),
+        #                 "anthropic-version": "2023-06-01",
+        #                 "content-type":      "application/json",
+        #             },
+        #             json={
+        #                 "model":      AI_MODEL,
+        #                 "max_tokens": AI_MAX_TOKENS,
+        #                 "messages":   [{"role": "user", "content": prompt}],
+        #             },
+        #         )
+        #         response.raise_for_status()
+        #         data    = response.json()
+        #         content = data["content"][0]["text"].strip()
+        #         return content, True
 
         # ── Fallback: Try OpenAI ──
-        if os.getenv("OPENAI_API_KEY"):
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                response = await client.post(
-                    "https://api.openai.com/v1/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
-                        "Content-Type":  "application/json",
-                    },
-                    json={
-                        "model":      "gpt-3.5-turbo",
-                        "max_tokens": AI_MAX_TOKENS,
-                        "messages":   [{"role": "user", "content": prompt}],
-                    },
-                )
-                response.raise_for_status()
-                data    = response.json()
-                content = data["choices"][0]["message"]["content"].strip()
-                return content, True
+        # if os.getenv("OPENAI_API_KEY"):
+        #     async with httpx.AsyncClient(timeout=10.0) as client:
+        #         response = await client.post(
+        #             "https://api.openai.com/v1/chat/completions",
+        #             headers={
+        #                 "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
+        #                 "Content-Type":  "application/json",
+        #             },
+        #             json={
+        #                 "model":      "gpt-3.5-turbo",
+        #                 "max_tokens": AI_MAX_TOKENS,
+        #                 "messages":   [{"role": "user", "content": prompt}],
+        #             },
+        #         )
+        #         response.raise_for_status()
+        #         data    = response.json()
+        #         content = data["choices"][0]["message"]["content"].strip()
+        #         return content, True
 
         # ── Try Gemini (Google) ──
-        if os.getenv("GOOGLE_API_KEY"):
+        if api_key:
             async with httpx.AsyncClient(timeout=20.0) as client:
                 response = await client.post(
-                    f"https://generativelanguage.googleapis.com/v1beta/{GEMINI_MODEL_PATH}:generateContent?key={os.getenv('GOOGLE_API_KEY')}",
+                    f"https://generativelanguage.googleapis.com/v1beta/{GEMINI_MODEL_PATH}:generateContent?key={api_key}",
                     headers={"Content-Type": "application/json"},
                     json={
                         "contents": [{
@@ -180,10 +188,12 @@ async def generate_ai_paragraph(
 
     except Exception as e:
         # Log but fall back gracefully
-        print(f"[generate_ai_paragraph] AI call failed: {type(e).__name__}: {e}")
-        pass
-
-    return generate_rule_based(focus_words), False
+        print("========== GEMINI ERROR ==========")
+        print(type(e).__name__)
+        print(str(e))
+        print("==================================")
+        
+        return generate_rule_based(focus_words), False
 
 
 # ──────────────────────────────────────────────
@@ -366,22 +376,34 @@ def get_practice_history(
     summary="Get the next recommended practice task",
 )
 async def get_next_practice(
-    current_user: User    = Depends(get_current_user),
-    session:      Session = Depends(get_session),
+    current_user:     User    = Depends(get_current_user),
+    session:          Session = Depends(get_session),
+    skip_task_id:     Optional[uuid.UUID] = Query(default=None),
+    word_count:       int  = Query(default=50, ge=10, le=500),
+    with_punctuation: bool = Query(default=False),
+    with_numbers:     bool = Query(default=False),
+    with_quotes:      bool = Query(default=False),
+    custom_topic:     Optional[str] = Query(default=None),
 ) -> PracticeTaskRead:
     """
-    Returns the most recent practice task, or generates a new one
-    if the user has patterns but no tasks.
+    Returns the most recent incomplete practice task, or generates a new one
+    from active patterns. Pass skip_task_id to force fresh generation when the
+    frontend knows the current task was just completed.
     """
-    # 1. Fetch newest task
+    # 1. Fetch newest incomplete task
     task = session.exec(
         select(PracticeTask)
         .where(PracticeTask.user_id == current_user.user_id)
         .order_by(PracticeTask.created_at.desc())
     ).first()
 
-    if task:
-        return task
+    if task and task.completed_count < task.repetition_count:
+        # Race-condition guard: frontend just submitted a session for this task
+        # but the DB update may not be visible yet — skip and generate fresh.
+        if skip_task_id and task.task_id == skip_task_id:
+            pass
+        else:
+            return task
 
     # 2. No task? Try to generate one from patterns
     patterns = session.exec(
@@ -402,7 +424,15 @@ async def get_next_practice(
 
     # Generate on the fly
     focus_words = [p.word for p in patterns]
-    content, ai_generated = await generate_ai_paragraph(focus_words, "medium")
+    content, ai_generated = await generate_ai_paragraph(
+        focus_words,
+        "medium",
+        word_count=word_count,
+        with_punctuation=with_punctuation,
+        with_numbers=with_numbers,
+        with_quotes=with_quotes,
+        custom_topic=custom_topic,
+    )
 
     new_task = PracticeTask(
         user_id      = current_user.user_id,
@@ -414,5 +444,4 @@ async def get_next_practice(
     session.add(new_task)
     session.commit()
     session.refresh(new_task)
-
     return new_task

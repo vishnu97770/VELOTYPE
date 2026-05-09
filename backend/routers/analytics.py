@@ -9,6 +9,15 @@ from database import get_session
 from models import MistakePattern, TypingSession, Mistake, User
 from routers.auth import get_current_user
 
+
+class DailyStatsResponse(BaseModel):
+    date: str
+    sessions_today: int
+    avg_wpm_today: float
+    avg_accuracy_today: float
+    total_sessions_all_time: int
+    best_wpm_today: float
+
 # ──────────────────────────────────────────────
 #  Router
 # ──────────────────────────────────────────────
@@ -63,7 +72,7 @@ class HeatmapResponse(BaseModel):
 def get_progress(
     current_user: User    = Depends(get_current_user),
     session:      Session = Depends(get_session),
-    limit:        int     = Query(default=50, ge=1, le=200, description="Number of recent sessions to include"),
+    limit:        int     = Query(default=50, ge=1, le=1000, description="Number of recent sessions to include"),
 ) -> ProgressResponse:
     """
     Returns the user's typing performance history, including:
@@ -170,4 +179,48 @@ def get_heatmap(
     return HeatmapResponse(
         total_unique_words=len(entries),
         entries=entries,
+    )
+
+
+# ──────────────────────────────────────────────
+#  GET /daily
+#  Returns stats for today (session count, WPM, accuracy)
+# ──────────────────────────────────────────────
+
+@router.get(
+    "/daily",
+    response_model=DailyStatsResponse,
+    summary="Get typing stats for today",
+)
+def get_daily_stats(
+    current_user: User    = Depends(get_current_user),
+    session:      Session = Depends(get_session),
+) -> DailyStatsResponse:
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    today_sessions = session.exec(
+        select(TypingSession)
+        .where(
+            TypingSession.user_id    == current_user.user_id,
+            TypingSession.created_at >= today_start,
+        )
+    ).all()
+
+    all_count = session.exec(
+        select(func.count(TypingSession.session_id))
+        .where(TypingSession.user_id == current_user.user_id)
+    ).one()
+
+    n = len(today_sessions)
+    avg_wpm = round(sum(s.wpm for s in today_sessions) / n, 1) if n else 0.0
+    avg_acc = round(sum(s.accuracy for s in today_sessions) / n, 1) if n else 0.0
+    best_wpm = round(max((s.wpm for s in today_sessions), default=0.0), 1)
+
+    return DailyStatsResponse(
+        date=today_start.date().isoformat(),
+        sessions_today=n,
+        avg_wpm_today=avg_wpm,
+        avg_accuracy_today=avg_acc,
+        total_sessions_all_time=all_count or 0,
+        best_wpm_today=best_wpm,
     )

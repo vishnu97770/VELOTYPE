@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+.pytest_cache/
+
+# Secrets — NEVER commit these
+backend/.env
+App/VeloTypeAI/.env
+App/VeloTypeAI/.env.local
+
+# Node / Vite
+node_modules/
+App/VeloTypeAI/dist/
+App/VeloTypeAI/.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude
+.claude/

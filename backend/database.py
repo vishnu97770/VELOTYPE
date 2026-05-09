@@ -1,6 +1,7 @@
 import os
 from typing import Generator
 
+from sqlalchemy import text
 from sqlmodel import SQLModel, Session, create_engine
 from dotenv import load_dotenv
 
@@ -12,7 +13,7 @@ load_dotenv()
 
 DATABASE_URL: str = os.getenv(
     "DATABASE_URL",
-    "sqlite:///./velotypeai.db",
+    "postgresql://velotype_db_user:1YBspfyQFkekTfcTcHsbnInvJRJCUR4o@dpg-d7u24q0sfn5c73cjp7kg-a.singapore-postgres.render.com/velotype_db",
 )
 
 # Fix for Render: SQLAlchemy expects postgresql:// but Render provides postgres://
@@ -62,11 +63,21 @@ else:
 
 def init_db() -> None:
     """Create all tables that do not yet exist in the database."""
-    # Import all models here so SQLModel's metadata is populated
-    # before create_all() is called.
     import models  # noqa: F401  (side-effect import)
 
     SQLModel.metadata.create_all(engine)
+
+    # Add new columns to existing tables idempotently (PostgreSQL only).
+    # SQLModel's create_all never alters existing tables, so we do it here.
+    if not _is_sqlite:
+        with engine.connect() as conn:
+            for stmt in [
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS elo_rating INTEGER NOT NULL DEFAULT 1000",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS wins       INTEGER NOT NULL DEFAULT 0",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS losses     INTEGER NOT NULL DEFAULT 0",
+            ]:
+                conn.execute(text(stmt))
+            conn.commit()
 
 
 # ──────────────────────────────────────────────

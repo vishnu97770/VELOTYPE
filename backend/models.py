@@ -41,11 +41,17 @@ class User(UserBase, table=True):
     created_at:    datetime  = Field(default_factory=now_utc, nullable=False)
     updated_at:    datetime  = Field(default_factory=now_utc, nullable=False)
 
+    # ── ELO / competitive fields (added via ALTER TABLE in init_db) ──
+    elo_rating: int = Field(default=1000, nullable=False)
+    wins:       int = Field(default=0,    nullable=False)
+    losses:     int = Field(default=0,    nullable=False)
+
     # ── Relationships ──
     sessions:         List["TypingSession"]  = Relationship(back_populates="user")
     mistakes:         List["Mistake"]        = Relationship(back_populates="user")
     mistake_patterns: List["MistakePattern"] = Relationship(back_populates="user")
     practice_tasks:   List["PracticeTask"]   = Relationship(back_populates="user")
+    room_players:     List["RoomPlayer"]     = Relationship(back_populates="user")
 
 
 class UserCreate(UserBase):
@@ -56,6 +62,9 @@ class UserRead(UserBase):
     user_id:    uuid.UUID
     created_at: datetime
     updated_at: datetime
+    elo_rating: int = 1000
+    wins:       int = 0
+    losses:     int = 0
 
 
 # ──────────────────────────────────────────────
@@ -258,4 +267,41 @@ class PracticeTaskRead(PracticeTaskBase):
     completed_count:     int
     is_assessment:       bool
     original_session_id: Optional[uuid.UUID]
-    
+
+
+# ──────────────────────────────────────────────
+#  MULTIPLAYER ROOMS
+# ──────────────────────────────────────────────
+
+class Room(SQLModel, table=True):
+    __tablename__ = "rooms"
+
+    room_id:     uuid.UUID          = Field(default_factory=uuid_pk, primary_key=True, nullable=False)
+    code:        str                = Field(max_length=6, unique=True, index=True, nullable=False)
+    status:      str                = Field(default="waiting", max_length=20, nullable=False)
+    prompt_text: str                = Field(sa_column=Column(Text, nullable=False))
+    host_id:     uuid.UUID          = Field(foreign_key="users.user_id", nullable=False)
+    created_at:  datetime           = Field(default_factory=now_utc, nullable=False)
+    started_at:  Optional[datetime] = Field(default=None, nullable=True)
+    finished_at: Optional[datetime] = Field(default=None, nullable=True)
+
+    players: List["RoomPlayer"] = Relationship(back_populates="room")
+
+
+class RoomPlayer(SQLModel, table=True):
+    __tablename__ = "room_players"
+    __table_args__ = (UniqueConstraint("room_id", "user_id", name="uq_room_user"),)
+
+    id:              uuid.UUID          = Field(default_factory=uuid_pk, primary_key=True, nullable=False)
+    room_id:         uuid.UUID          = Field(foreign_key="rooms.room_id", nullable=False, index=True)
+    user_id:         uuid.UUID          = Field(foreign_key="users.user_id", nullable=False, index=True)
+    username:        str                = Field(max_length=50, nullable=False)
+    progress:        float              = Field(default=0.0, nullable=False)
+    wpm:             float              = Field(default=0.0, nullable=False)
+    accuracy:        float              = Field(default=0.0, nullable=False)
+    finish_position: Optional[int]      = Field(default=None, nullable=True)
+    finished_at:     Optional[datetime] = Field(default=None, nullable=True)
+    elo_change:      Optional[int]      = Field(default=None, nullable=True)
+
+    room: "Room" = Relationship(back_populates="players")
+    user: "User" = Relationship(back_populates="room_players")

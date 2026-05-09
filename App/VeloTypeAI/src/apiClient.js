@@ -12,8 +12,12 @@ const apiClient = async (endpoint, options = {}) => {
   });
 
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.detail || "Something went wrong");
+    const error = await res.json().catch(() => ({}));
+    const detail = error?.detail;
+    const msg = Array.isArray(detail)
+      ? detail.map(d => d.msg || JSON.stringify(d)).join(' | ')
+      : (typeof detail === 'string' ? detail : `HTTP ${res.status}`);
+    throw new Error(msg || 'Something went wrong');
   }
 
   return res.json();

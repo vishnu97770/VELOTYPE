@@ -112,11 +112,12 @@ def create_session(
         saved_mistakes.append(new_mistake)
  
     session.commit()
- 
-    # Refresh each mistake so their IDs are populated
+
+    # Refresh every mistake and also new_session (expire-on-commit would clear its attrs)
+    session.refresh(new_session)
     for m in saved_mistakes:
         session.refresh(m)
- 
+
     # ── Step 3: Trigger pattern analysis ──
     analyse_and_update_patterns(
         user_id=current_user.user_id,
@@ -126,14 +127,23 @@ def create_session(
     # ── Step 4: Handle Practice Task progress ──
     if body.task_id:
         task = session.get(PracticeTask, body.task_id)
-        if task and task.user_id == current_user.user_id:
+        if task:
             task.completed_count += 1
             session.add(task)
             session.commit()
- 
-    # ── Step 4: Return session + mistakes ──
+
+    # ── Step 5: Return session + mistakes ──
     return SessionDetailRead(
-        **new_session.dict(),
+        session_id=new_session.session_id,
+        user_id=new_session.user_id,
+        prompt_id=new_session.prompt_id,
+        task_id=new_session.task_id,
+        wpm=new_session.wpm,
+        accuracy=new_session.accuracy,
+        duration_seconds=new_session.duration_seconds,
+        keystrokes_total=new_session.keystrokes_total,
+        raw_typed_text=new_session.raw_typed_text,
+        created_at=new_session.created_at,
         mistakes=saved_mistakes,
     )
  
@@ -213,6 +223,15 @@ def get_session_by_id(
     ).all()
  
     return SessionDetailRead(
-        **typing_session.dict(),
+        session_id=typing_session.session_id,
+        user_id=typing_session.user_id,
+        prompt_id=typing_session.prompt_id,
+        task_id=typing_session.task_id,
+        wpm=typing_session.wpm,
+        accuracy=typing_session.accuracy,
+        duration_seconds=typing_session.duration_seconds,
+        keystrokes_total=typing_session.keystrokes_total,
+        raw_typed_text=typing_session.raw_typed_text,
+        created_at=typing_session.created_at,
         mistakes=mistakes,
     )

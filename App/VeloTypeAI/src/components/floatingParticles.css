@@ -1,0 +1,27 @@
+/* ──────────────────────────────────────────────────
+   FloatingParticles — global ambient particle canvas
+────────────────────────────────────────────────── */
+
+.fp-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;          /* above solid #0A0A0A background, below page content */
+}
+
+/* ── Fallback CSS-only floatUp (used by login.jsx particles) ── */
+@keyframes floatUp {
+  0%   { transform: translateY(110vh) scale(0.5); opacity: 0; }
+  5%   { opacity: 1; }
+  90%  { opacity: 0.5; }
+  100% { transform: translateY(-10vh) scale(1.3) rotate(360deg); opacity: 0; }
+}
+
+/* ── Pulse glow helper — apply to any element ── */
+@keyframes glowPulse {
+  0%   { box-shadow: 0 0 6px  2px rgba(255, 214, 0, 0.25); }
+  50%  { box-shadow: 0 0 18px 5px rgba(255, 214, 0, 0.55); }
+  100% { box-shadow: 0 0 6px  2px rgba(255, 214, 0, 0.25); }
+}

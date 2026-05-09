@@ -1,7 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
-
 from database import get_session
 from models import MistakePattern, MistakePatternRead, User
 from routers.auth import get_current_user
@@ -16,7 +15,7 @@ router = APIRouter()
 #  Constants
 # ──────────────────────────────────────────────
 
-PATTERN_THRESHOLD = 3  # mistake_count must be >= this to be flagged as active
+PATTERN_THRESHOLD = 1  # 1 mistake is enough to flag a pattern as active
 
 # ──────────────────────────────────────────────
 #  GET /
@@ -145,5 +144,4 @@ def analyse_and_update_patterns(
                 is_active     = count >= PATTERN_THRESHOLD,
             )
             session.add(new_pattern)
-
     session.commit()

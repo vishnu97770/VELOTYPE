@@ -16,9 +16,9 @@ from database import init_db
 
 load_dotenv()
 
-ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
-FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
-GEMINI_API_KEY: str = os.getenv("FETCH_PARAGRAPGH", "AIzaSyAQtaUcsg5LaBDw3DNEScN8Yudr19o1A9M")
+ENVIRONMENT: str = os.getenv("ENVIRONMENT", "production")
+FRONTEND_URL: str = os.getenv("FRONTEND_URL", "velotype-three.vercel.app")
+GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "AIzaSyAlWeUvVch-Pk-rqDAOTJaTQeH9ivkwFeQ")
 
 # ──────────────────────────────────────────────
 #  Rate Limiter
@@ -34,12 +34,12 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ── Startup ──
-    print("🚀 Starting VeloTypeAI API...")
+    print(" Starting VeloTypeAI API...")
     init_db()
-    print("✅ Database initialised.")
+    print("Database initialised.")
     yield
     # ── Shutdown ──
-    print("🛑 Shutting down VeloTypeAI API...")
+    print(" Shutting down VeloTypeAI API...")
 
 
     
@@ -66,8 +66,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Build allowed origins list from FRONTEND_URL env var plus common dev origins
 _dev_origins = [
     "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
     "http://localhost:4173",
+    "http://localhost:4174",
     "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
     "http://127.0.0.1:4173",
 ]
 _prod_origins = [o.strip() for o in FRONTEND_URL.split(",") if o.strip()]
@@ -91,15 +95,17 @@ allow_headers=["*"],
 #  Each router lives in its own file under /routers
 # ──────────────────────────────────────────────
 
-from routers import auth, sessions, patterns, practice, analytics  # noqa: E402
+from routers import auth, sessions, patterns, practice, analytics, rooms, leaderboard  # noqa: E402
 
 API_PREFIX = "/api/v1"
 
-app.include_router(auth.router,      prefix=f"{API_PREFIX}/auth",      tags=["Auth"])
-app.include_router(sessions.router,  prefix=f"{API_PREFIX}/sessions",  tags=["Sessions"])
-app.include_router(patterns.router,  prefix=f"{API_PREFIX}/patterns",  tags=["Patterns"])
-app.include_router(practice.router,  prefix=f"{API_PREFIX}/practice",  tags=["Practice"])
-app.include_router(analytics.router, prefix=f"{API_PREFIX}/analytics", tags=["Analytics"])
+app.include_router(auth.router,        prefix=f"{API_PREFIX}/auth",        tags=["Auth"])
+app.include_router(sessions.router,    prefix=f"{API_PREFIX}/sessions",    tags=["Sessions"])
+app.include_router(patterns.router,    prefix=f"{API_PREFIX}/patterns",    tags=["Patterns"])
+app.include_router(practice.router,    prefix=f"{API_PREFIX}/practice",    tags=["Practice"])
+app.include_router(analytics.router,   prefix=f"{API_PREFIX}/analytics",   tags=["Analytics"])
+app.include_router(rooms.router,       prefix=f"{API_PREFIX}/rooms",       tags=["Rooms"])
+app.include_router(leaderboard.router, prefix=f"{API_PREFIX}/leaderboard", tags=["Leaderboard"])
 
 # ──────────────────────────────────────────────
 #  Health Check
@@ -133,5 +139,5 @@ if __name__ == "__main__":
         "main:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT", 8000)),
-        reload=ENVIRONMENT == "development",
+        reload=ENVIRONMENT == "production",
 )

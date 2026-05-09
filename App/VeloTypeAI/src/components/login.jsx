@@ -128,11 +128,11 @@ function Login() {
             height: p.size,
             left: `${p.left}%`,
             background: p.cyan
-              ? `rgba(0,240,255,${Math.random() * 0.4 + 0.3})`
-              : `rgba(167,139,250,${Math.random() * 0.3 + 0.2})`,
+              ? `rgba(255,214,0,${Math.random() * 0.4 + 0.3})`
+              : `rgba(255,180,0,${Math.random() * 0.3 + 0.2})`,
             boxShadow: p.cyan
-              ? `0 0 ${p.size * 3}px rgba(0,240,255,0.6)`
-              : `0 0 ${p.size * 3}px rgba(167,139,250,0.5)`,
+              ? `0 0 ${p.size * 3}px rgba(255,214,0,0.6)`
+              : `0 0 ${p.size * 3}px rgba(255,180,0,0.5)`,
             borderRadius: '50%',
             animationDelay: `${p.delay}s`,
             animationDuration: `${p.duration}s`,
@@ -186,12 +186,12 @@ function Login() {
               textTransform: 'uppercase',
               transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
               background: activeTab === tab
-                ? 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,240,255,0.08))'
+                ? 'linear-gradient(135deg, rgba(255,214,0,0.15), rgba(255,214,0,0.08))'
                 : 'rgba(255,255,255,0.03)',
-              borderColor: activeTab === tab ? 'rgba(0,240,255,0.35)' : 'rgba(255,255,255,0.06)',
-              color: activeTab === tab ? '#00f0ff' : '#646669',
+              borderColor: activeTab === tab ? 'rgba(255,214,0,0.35)' : 'rgba(255,255,255,0.06)',
+              color: activeTab === tab ? '#FFD600' : '#555555',
               boxShadow: activeTab === tab
-                ? '0 0 20px rgba(0,240,255,0.15), inset 0 1px 0 rgba(0,240,255,0.15)'
+                ? '0 0 20px rgba(255,214,0,0.15), inset 0 1px 0 rgba(255,214,0,0.15)'
                 : 'none',
               transform: activeTab === tab ? 'translateY(-2px)' : 'none',
             }}
