@@ -20,8 +20,8 @@ const NAV_CSS = `
 }
 .nb-inner {
   width: 100%;
-  padding: 0 40px;
-  height: 68px;
+  padding: 0 48px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -29,7 +29,7 @@ const NAV_CSS = `
 }
 .nb-logo {
   font-family: 'Outfit', sans-serif;
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 900;
   color: #fff;
   text-decoration: none;
@@ -50,24 +50,24 @@ const NAV_CSS = `
 .nb-link {
   color: #555;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 500;
-  padding: 7px 16px;
+  padding: 8px 18px;
   border-radius: 7px;
   transition: color 0.2s, background 0.2s;
   font-family: 'JetBrains Mono', monospace;
 }
 .nb-link:hover { color: #d1d0c5; background: rgba(255,255,255,0.05); }
 .nb-link.nb-active { color: #FFD600; }
-.nb-auth { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-.nb-user { font-size: 15px; color: rgba(255,214,0,0.7); font-family: 'JetBrains Mono', monospace; }
+.nb-auth { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.nb-user { font-size: 17px; color: rgba(255,214,0,0.7); font-family: 'JetBrains Mono', monospace; }
 .nb-signin {
-  padding: 9px 22px;
+  padding: 10px 26px;
   border-radius: 8px;
   background: #FFD600;
   color: #0A0A0A;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 17px;
   font-family: 'Outfit', sans-serif;
   text-decoration: none;
   border: none;
@@ -81,12 +81,12 @@ const NAV_CSS = `
   color: #0A0A0A;
 }
 .nb-logout {
-  padding: 8px 18px;
+  padding: 9px 20px;
   border-radius: 8px;
   background: transparent;
   color: #ca4754;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 17px;
   font-family: 'Outfit', sans-serif;
   border: 1px solid rgba(202,71,84,0.35);
   cursor: pointer;
