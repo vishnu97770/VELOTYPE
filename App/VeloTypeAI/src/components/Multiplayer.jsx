@@ -305,13 +305,17 @@ const CSS = `
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 14px;
   padding: 28px 32px;
-  font-size: 22px;
-  line-height: 1.6;
+  font-size: 20px;
+  line-height: 1.8;
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.5px;
   cursor: text;
   position: relative;
   min-height: 100px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  overflow: hidden;
 }
 .mp-char-correct { color: #4ade80; }
 .mp-char-wrong   { color: #f87171; background: rgba(248,113,113,0.15); border-radius: 2px; }
