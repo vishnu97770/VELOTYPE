@@ -49,6 +49,30 @@ function Login() {
   const [loginError, setLoginError] = useState('');
   const [loginSuccess, setLoginSuccess] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleStatus, setGoogleStatus] = useState('');
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setLoginError('');
+    setGoogleStatus('Waking up server…');
+    const healthUrl = `${API_BASE}/health`;
+    for (let i = 0; i < 20; i++) {
+      try {
+        const res = await fetch(healthUrl, { signal: AbortSignal.timeout(5000) });
+        if (res.ok) {
+          setGoogleStatus('Redirecting to Google…');
+          window.location.href = `${API_BASE}/auth/google`;
+          return;
+        }
+      } catch { /* still sleeping */ }
+      setGoogleStatus(`Connecting to server… (${i + 1}s)`);
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    setGoogleLoading(false);
+    setGoogleStatus('');
+    setLoginError('Server took too long to wake up. Please try again in a moment.');
+  };
 
   const [registerData, setRegisterData] = useState({
     username: '', email: '', verifyEmail: '', password: '', verifyPassword: '',
@@ -244,12 +268,26 @@ function Login() {
               <button
                 className="social-btn"
                 title="Continue with Google"
-                onClick={() => { window.location.href = `${API_BASE}/auth/google`; }}
+                onClick={handleGoogleLogin}
+                disabled={googleLoading}
+                style={{ opacity: googleLoading ? 0.7 : 1, cursor: googleLoading ? 'not-allowed' : 'pointer' }}
               >
-                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 488 512" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
-                </svg>
+                {googleLoading ? (
+                  <svg style={{ animation: 'spin 1s linear infinite' }} stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.2)" strokeWidth="3"/>
+                    <path d="M12 2a10 10 0 0 1 10 10" stroke="#FFD600" strokeWidth="3" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 488 512" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
+                  </svg>
+                )}
               </button>
+              {googleStatus && (
+                <p style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: '#FFD600', fontFamily: "'JetBrains Mono', monospace" }}>
+                  {googleStatus}
+                </p>
+              )}
             </div>
 
             <div className="separator">or</div>
