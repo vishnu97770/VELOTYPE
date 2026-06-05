@@ -19,18 +19,17 @@ const NAV_CSS = `
   border-bottom-color: rgba(255,214,0,0.14);
 }
 .nb-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  height: 64px;
+  width: 100%;
+  padding: 0 40px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 32px;
 }
 .nb-logo {
   font-family: 'Outfit', sans-serif;
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 900;
   color: #fff;
   text-decoration: none;
@@ -43,30 +42,32 @@ const NAV_CSS = `
 .nb-logo-y { color: #FFD600; text-shadow: 0 0 20px rgba(255,214,0,0.5); }
 .nb-links {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   align-items: center;
+  flex: 1;
+  justify-content: center;
 }
 .nb-link {
   color: #555;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
-  padding: 6px 12px;
+  padding: 7px 16px;
   border-radius: 7px;
   transition: color 0.2s, background 0.2s;
   font-family: 'JetBrains Mono', monospace;
 }
 .nb-link:hover { color: #d1d0c5; background: rgba(255,255,255,0.05); }
 .nb-link.nb-active { color: #FFD600; }
-.nb-auth { display: flex; align-items: center; gap: 10px; }
-.nb-user { font-size: 13px; color: rgba(255,214,0,0.7); font-family: 'JetBrains Mono', monospace; }
+.nb-auth { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.nb-user { font-size: 15px; color: rgba(255,214,0,0.7); font-family: 'JetBrains Mono', monospace; }
 .nb-signin {
-  padding: 8px 18px;
+  padding: 9px 22px;
   border-radius: 8px;
   background: #FFD600;
   color: #0A0A0A;
   font-weight: 800;
-  font-size: 13px;
+  font-size: 15px;
   font-family: 'Outfit', sans-serif;
   text-decoration: none;
   border: none;
@@ -80,12 +81,12 @@ const NAV_CSS = `
   color: #0A0A0A;
 }
 .nb-logout {
-  padding: 7px 16px;
+  padding: 8px 18px;
   border-radius: 8px;
   background: transparent;
   color: #ca4754;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 15px;
   font-family: 'Outfit', sans-serif;
   border: 1px solid rgba(202,71,84,0.35);
   cursor: pointer;
