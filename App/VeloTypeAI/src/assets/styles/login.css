@@ -360,7 +360,9 @@ input:hover:not(:focus) {
 /* ── Social Login ── */
 .social-login {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   margin-bottom: 4px;
 }
 
