@@ -95,17 +95,18 @@ allow_headers=["*"],
 #  Each router lives in its own file under /routers
 # ──────────────────────────────────────────────
 
-from routers import auth, sessions, patterns, practice, analytics, rooms, leaderboard  # noqa: E402
+from routers import auth, sessions, patterns, practice, analytics, rooms, leaderboard, social_auth  # noqa: E402
 
 API_PREFIX = "/api/v1"
 
-app.include_router(auth.router,        prefix=f"{API_PREFIX}/auth",        tags=["Auth"])
-app.include_router(sessions.router,    prefix=f"{API_PREFIX}/sessions",    tags=["Sessions"])
-app.include_router(patterns.router,    prefix=f"{API_PREFIX}/patterns",    tags=["Patterns"])
-app.include_router(practice.router,    prefix=f"{API_PREFIX}/practice",    tags=["Practice"])
-app.include_router(analytics.router,   prefix=f"{API_PREFIX}/analytics",   tags=["Analytics"])
-app.include_router(rooms.router,       prefix=f"{API_PREFIX}/rooms",       tags=["Rooms"])
-app.include_router(leaderboard.router, prefix=f"{API_PREFIX}/leaderboard", tags=["Leaderboard"])
+app.include_router(auth.router,         prefix=f"{API_PREFIX}/auth",        tags=["Auth"])
+app.include_router(social_auth.router,  prefix=f"{API_PREFIX}/auth",        tags=["Auth"])
+app.include_router(sessions.router,     prefix=f"{API_PREFIX}/sessions",    tags=["Sessions"])
+app.include_router(patterns.router,     prefix=f"{API_PREFIX}/patterns",    tags=["Patterns"])
+app.include_router(practice.router,     prefix=f"{API_PREFIX}/practice",    tags=["Practice"])
+app.include_router(analytics.router,    prefix=f"{API_PREFIX}/analytics",   tags=["Analytics"])
+app.include_router(rooms.router,        prefix=f"{API_PREFIX}/rooms",       tags=["Rooms"])
+app.include_router(leaderboard.router,  prefix=f"{API_PREFIX}/leaderboard", tags=["Leaderboard"])
 
 # ──────────────────────────────────────────────
 #  Health Check
