@@ -22,10 +22,9 @@ const NAV_CSS = `
   width: 100%;
   padding: 0 48px;
   height: 72px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 32px;
 }
 .nb-logo {
   font-family: 'Outfit', sans-serif;
@@ -36,44 +35,49 @@ const NAV_CSS = `
   letter-spacing: -0.5px;
   display: flex;
   align-items: center;
-  gap: 0;
-  flex-shrink: 0;
+  justify-content: flex-start;
 }
 .nb-logo-y { color: #FFD600; text-shadow: 0 0 20px rgba(255,214,0,0.5); }
 .nb-links {
   display: flex;
   gap: 8px;
   align-items: center;
-  flex: 1;
   justify-content: center;
 }
 .nb-link {
   color: #555;
   text-decoration: none;
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 500;
   padding: 8px 18px;
   border-radius: 7px;
   transition: color 0.2s, background 0.2s;
   font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
 }
 .nb-link:hover { color: #d1d0c5; background: rgba(255,255,255,0.05); }
 .nb-link.nb-active { color: #FFD600; }
-.nb-auth { display: flex; align-items: center; gap: 14px; margin-left: auto; }
-.nb-user { font-size: 17px; color: rgba(255,214,0,0.7); font-family: 'JetBrains Mono', monospace; }
+.nb-auth {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: flex-end;
+}
+.nb-user { font-size: 22px; color: rgba(255,214,0,0.7); font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
 .nb-signin {
   padding: 10px 26px;
   border-radius: 8px;
   background: #FFD600;
   color: #0A0A0A;
   font-weight: 800;
-  font-size: 17px;
+  font-size: 20px;
   font-family: 'Outfit', sans-serif;
   text-decoration: none;
   border: none;
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 4px 16px rgba(255,214,0,0.3);
+  white-space: nowrap;
 }
 .nb-signin:hover {
   transform: translateY(-1px);
@@ -86,16 +90,17 @@ const NAV_CSS = `
   background: transparent;
   color: #ca4754;
   font-weight: 600;
-  font-size: 17px;
+  font-size: 20px;
   font-family: 'Outfit', sans-serif;
   border: 1px solid rgba(202,71,84,0.35);
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 .nb-logout:hover { background: rgba(202,71,84,0.08); border-color: rgba(202,71,84,0.6); }
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .nb-links { display: none; }
-  .nb-inner { padding: 0 16px; }
+  .nb-inner { padding: 0 20px; grid-template-columns: 1fr auto; }
 }
 `;
 
