@@ -126,7 +126,6 @@ export default function Navbar() {
             <Link to="/multiplayer"   className={active('/multiplayer')}>Race</Link>
             <Link to="/leaderboard"   className={active('/leaderboard')}>Leaderboard</Link>
             {isLoggedIn && <Link to="/dashboard" className={active('/dashboard')}>Dashboard</Link>}
-            <Link to="/contact"       className={active('/contact')}>Contact</Link>
           </div>
 
           <div className="nb-auth">
