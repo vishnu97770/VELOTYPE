@@ -158,6 +158,45 @@ const CSS = `
   margin-top: -8px;
 }
 
+/* ── Room Options ── */
+.mp-options-label {
+  font-size: 11px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px;
+}
+.mp-options-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mp-opt-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mp-opt-btn:hover { border-color: rgba(255,214,0,0.3); color: #FFD600; }
+.mp-opt-btn.active {
+  background: rgba(255,214,0,0.12);
+  border-color: rgba(255,214,0,0.5);
+  color: #FFD600;
+  font-weight: 700;
+}
+.mp-opt-btn.diff-easy.active   { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.5); color: #4ade80; }
+.mp-opt-btn.diff-medium.active { background: rgba(255,214,0,0.12);  border-color: rgba(255,214,0,0.5);  color: #FFD600; }
+.mp-opt-btn.diff-hard.active   { background: rgba(248,113,113,0.12); border-color: rgba(248,113,113,0.5); color: #f87171; }
+.mp-opt-btn.toggle.active      { background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.5); color: #a78bfa; }
+.mp-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
+
 /* ── Waiting room ── */
 .mp-waiting {
   width: 100%;
@@ -470,6 +509,16 @@ export default function Multiplayer() {
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
 
+  // ── Room creation options ──
+  const [difficulty,       setDifficulty]       = useState('medium');
+  const [wordCount,        setWordCount]         = useState(50);
+  const [maxPlayers,       setMaxPlayers]        = useState(6);
+  const [customPlayers,    setCustomPlayers]     = useState('');
+  const [showCustomPlayers,setShowCustomPlayers] = useState(false);
+  const [withPunctuation,  setWithPunctuation]   = useState(false);
+  const [withNumbers,      setWithNumbers]       = useState(false);
+  const [withQuotes,       setWithQuotes]        = useState(false);
+
   const wsRef            = useRef(null);
   const inputRef         = useRef(null);
   const progressTimerRef = useRef(null);
@@ -586,7 +635,17 @@ export default function Multiplayer() {
     setLoading(true);
     setError('');
     try {
-      const res = await apiClient('/rooms', { method: 'POST' });
+      const res = await apiClient('/rooms', {
+        method: 'POST',
+        body: JSON.stringify({
+          difficulty,
+          word_count:       wordCount,
+          max_players:      maxPlayers,
+          with_punctuation: withPunctuation,
+          with_numbers:     withNumbers,
+          with_quotes:      withQuotes,
+        }),
+      });
       setRoomCode(res.room_code);
       setPhase('waiting');
       connectWs(res.room_code);
@@ -670,13 +729,111 @@ export default function Multiplayer() {
           <div className="mp-lobby">
             <div className="mp-card">
               <h2>Create Room</h2>
-              <p>Start a new race room and invite friends via a 6-digit code.</p>
+              <p>Customize your race then invite friends via a 6-digit code.</p>
+
+              <div className="mp-divider" />
+
+              {/* Difficulty */}
+              <div>
+                <p className="mp-options-label">Difficulty</p>
+                <div className="mp-options-row">
+                  {['easy','medium','hard'].map(d => (
+                    <button key={d}
+                      className={`mp-opt-btn diff-${d} ${difficulty === d ? 'active' : ''}`}
+                      onClick={() => setDifficulty(d)}>
+                      {d.charAt(0).toUpperCase() + d.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Word Count */}
+              <div>
+                <p className="mp-options-label">Word Count</p>
+                <div className="mp-options-row">
+                  {[25, 50, 75, 100].map(w => (
+                    <button key={w}
+                      className={`mp-opt-btn ${wordCount === w ? 'active' : ''}`}
+                      onClick={() => setWordCount(w)}>
+                      {w}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Max Players */}
+              <div>
+                <p className="mp-options-label">Max Players</p>
+                <div className="mp-options-row">
+                  {[2, 3, 4, 5, 6].map(n => (
+                    <button key={n}
+                      className={`mp-opt-btn ${maxPlayers === n && !showCustomPlayers ? 'active' : ''}`}
+                      onClick={() => { setMaxPlayers(n); setShowCustomPlayers(false); setCustomPlayers(''); }}>
+                      {n}
+                    </button>
+                  ))}
+                  <button
+                    className={`mp-opt-btn toggle ${showCustomPlayers ? 'active' : ''}`}
+                    onClick={() => setShowCustomPlayers(v => !v)}>
+                    custom
+                  </button>
+                  {showCustomPlayers && (
+                    <input
+                      type="number"
+                      min="2"
+                      max="20"
+                      placeholder="e.g. 8"
+                      value={customPlayers}
+                      onChange={e => {
+                        setCustomPlayers(e.target.value);
+                        const val = parseInt(e.target.value, 10);
+                        if (!isNaN(val) && val >= 2) setMaxPlayers(val);
+                      }}
+                      style={{
+                        width: '72px',
+                        padding: '7px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(167,139,250,0.5)',
+                        background: 'rgba(167,139,250,0.1)',
+                        color: '#a78bfa',
+                        fontSize: '13px',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        outline: 'none',
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Content Toggles */}
+              <div>
+                <p className="mp-options-label">Include</p>
+                <div className="mp-options-row">
+                  <button
+                    className={`mp-opt-btn toggle ${withPunctuation ? 'active' : ''}`}
+                    onClick={() => setWithPunctuation(v => !v)}>
+                    punct
+                  </button>
+                  <button
+                    className={`mp-opt-btn toggle ${withNumbers ? 'active' : ''}`}
+                    onClick={() => setWithNumbers(v => !v)}>
+                    numbers
+                  </button>
+                  <button
+                    className={`mp-opt-btn toggle ${withQuotes ? 'active' : ''}`}
+                    onClick={() => setWithQuotes(v => !v)}>
+                    quotes
+                  </button>
+                </div>
+              </div>
+
+              <div className="mp-divider" />
+
               {error && <p className="mp-error">{error}</p>}
               <button
                 className="mp-btn mp-btn-primary"
                 onClick={handleCreate}
-                disabled={loading}
-              >
+                disabled={loading}>
                 {loading ? 'Creating…' : '+ Create Room'}
               </button>
             </div>

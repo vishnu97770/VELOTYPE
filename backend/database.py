@@ -72,9 +72,10 @@ def init_db() -> None:
     if not _is_sqlite:
         with engine.connect() as conn:
             for stmt in [
-                "ALTER TABLE users ADD COLUMN IF NOT EXISTS elo_rating INTEGER NOT NULL DEFAULT 1000",
-                "ALTER TABLE users ADD COLUMN IF NOT EXISTS wins       INTEGER NOT NULL DEFAULT 0",
-                "ALTER TABLE users ADD COLUMN IF NOT EXISTS losses     INTEGER NOT NULL DEFAULT 0",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS elo_rating  INTEGER NOT NULL DEFAULT 1000",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS wins        INTEGER NOT NULL DEFAULT 0",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS losses      INTEGER NOT NULL DEFAULT 0",
+                "ALTER TABLE rooms ADD COLUMN IF NOT EXISTS max_players INTEGER NOT NULL DEFAULT 6",
             ]:
                 conn.execute(text(stmt))
             conn.commit()

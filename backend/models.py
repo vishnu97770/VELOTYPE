@@ -281,6 +281,7 @@ class Room(SQLModel, table=True):
     status:      str                = Field(default="waiting", max_length=20, nullable=False)
     prompt_text: str                = Field(sa_column=Column(Text, nullable=False))
     host_id:     uuid.UUID          = Field(foreign_key="users.user_id", nullable=False)
+    max_players: int                = Field(default=6, nullable=False)
     created_at:  datetime           = Field(default_factory=now_utc, nullable=False)
     started_at:  Optional[datetime] = Field(default=None, nullable=True)
     finished_at: Optional[datetime] = Field(default=None, nullable=True)

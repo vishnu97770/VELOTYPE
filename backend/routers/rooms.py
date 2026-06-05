@@ -19,24 +19,96 @@ router = APIRouter()
 #  Race prompt pool
 # ──────────────────────────────────────────────
 
-RACE_PROMPTS = [
-    "The quick brown fox jumps over the lazy dog. Speed and precision define the master typist. Every keystroke brings you closer to excellence and glory.",
-    "In the realm of competitive typing, accuracy matters as much as speed. Focus on each word as it comes, breathe steadily, and let your fingers find their rhythm.",
-    "Technology transforms the way we communicate and collaborate. The keyboard becomes an extension of thought when your fingers move with practiced confidence and grace.",
-    "Champions are not born overnight. They are forged through countless hours of deliberate practice, relentless focus, and the courage to compete against the best.",
-    "The universe is under no obligation to make sense to you. Through curiosity, persistence, and the right tools, we unravel its mysteries one discovery at a time.",
-    "A smooth sea never made a skilled sailor. Face each challenge head on, adapt your technique, and transform every obstacle into an opportunity for growth.",
-    "Efficiency is doing things right. Effectiveness is doing the right things. The master typist balances both: precise keystrokes delivered at the perfect moment.",
-    "Code is poetry written in logic. Every line tells a story, every function solves a problem, and every program is a conversation between human intention and machine.",
-    "Time is the most valuable currency we possess. Invest it wisely in learning skills that compound over years and separate the extraordinary from the ordinary typist.",
-    "The art of typing is the art of thinking made visible. Train your hands to follow your mind seamlessly, and your ideas will flow onto the page without friction.",
-    "Velocity without direction is chaos. Precision without speed is stagnation. The elite typist masters both, transforming raw keystrokes into words that move the world.",
-    "Every word you type is a small victory. String enough victories together and you become unstoppable. Practice daily, compete fiercely, improve endlessly, and never quit.",
-]
+RACE_PROMPTS = {
+    "easy": [
+        "the cat sat on the mat and looked at the dog who was sleeping near the door on a warm sunny day",
+        "she went to the store to buy some bread and milk and came back home before it started to rain outside",
+        "the boy ran fast across the green field and stopped when he reached the big old tree at the end",
+        "type each word slowly and carefully and you will find that your speed will grow with every single session",
+        "the sun was bright and the sky was blue and the birds were singing in the trees all morning long",
+        "he opened the book and began to read the first page slowly taking his time to understand every word",
+        "practice makes perfect and every minute you spend typing brings you one step closer to your personal best speed",
+        "the dog wagged its tail and ran to the door when it heard the sound of the car outside",
+    ],
+    "medium": [
+        "The quick brown fox jumps over the lazy dog. Speed and precision define the master typist. Every keystroke brings you closer to excellence and glory.",
+        "In the realm of competitive typing, accuracy matters as much as speed. Focus on each word as it comes, breathe steadily, and let your fingers find their rhythm.",
+        "Technology transforms the way we communicate and collaborate. The keyboard becomes an extension of thought when your fingers move with practiced confidence and grace.",
+        "Champions are not born overnight. They are forged through countless hours of deliberate practice, relentless focus, and the courage to compete against the best.",
+        "A smooth sea never made a skilled sailor. Face each challenge head on, adapt your technique, and transform every obstacle into an opportunity for growth.",
+        "Efficiency is doing things right. Effectiveness is doing the right things. The master typist balances both: precise keystrokes delivered at the perfect moment.",
+        "Time is the most valuable currency we possess. Invest it wisely in learning skills that compound over years and separate the extraordinary from the ordinary typist.",
+        "Every word you type is a small victory. String enough victories together and you become unstoppable. Practice daily, compete fiercely, improve endlessly, and never quit.",
+    ],
+    "hard": [
+        "The phenomenon of neuroplasticity demonstrates that consistent, deliberate practice fundamentally restructures the architecture of the human brain, enabling extraordinary improvements in cognitive performance.",
+        "Sophisticated algorithms orchestrate the synchronization of distributed systems, ensuring that concurrent processes maintain consistency while maximizing throughput across heterogeneous computational environments.",
+        "Cryptographic protocols safeguard communications by implementing asymmetric key exchange mechanisms, guaranteeing that intercepted transmissions remain unintelligible without the corresponding decryption credentials.",
+        "The thermodynamic equilibrium of isolated systems inexorably progresses toward maximum entropy, a phenomenon eloquently described by the second law and quantified through statistical mechanics.",
+        "Philosophical epistemology systematically investigates the foundations, scope, and limitations of human knowledge, questioning whether objective truth is attainable or perpetually obscured by subjective interpretation.",
+        "Quantum entanglement produces instantaneous correlations between spatially separated particles, challenging classical notions of locality and causality in ways that continue to perplex theoretical physicists worldwide.",
+        "The intricate interplay between macroeconomic variables such as inflation, unemployment, and monetary policy requires sophisticated modelling frameworks to anticipate systemic consequences of governmental fiscal decisions.",
+        "Neuromorphic computing architectures emulate biological neural networks by implementing spike-based information processing, potentially revolutionizing artificial intelligence through unprecedented energy efficiency and adaptive learning capabilities.",
+    ],
+}
 
 
 def _gen_code() -> str:
     return "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+
+# ──────────────────────────────────────────────
+#  Prompt modifiers
+# ──────────────────────────────────────────────
+
+def _apply_punctuation(text: str) -> str:
+    words = text.split()
+    if len(words) < 6:
+        return text
+    out, pos = [], 0
+    while pos < len(words):
+        sent_len = 10 + random.randint(0, 8)
+        end = min(pos + sent_len, len(words))
+        for i in range(pos, end):
+            w = words[i]
+            if i == pos and pos > 0:
+                w = w[0].upper() + w[1:]
+            mid = pos + sent_len // 2
+            if i == mid and i < end - 1 and not w.endswith((',', '.')):
+                w += ','
+            if i == end - 1:
+                w = w.rstrip(',;') + '.'
+            out.append(w)
+        pos = end
+    return " ".join(out)
+
+_NUM_TOKENS = ['2', '5', '10', '25', '42', '100', '7', '3', '15', '50']
+
+def _apply_numbers(text: str) -> str:
+    words = text.split()
+    if len(words) < 8:
+        return text
+    result = list(words)
+    count = min(6, len(words) // 8)
+    step  = len(words) // (count + 1)
+    for i in range(count, 0, -1):
+        result.insert(i * step, _NUM_TOKENS[(i - 1) % len(_NUM_TOKENS)])
+    return " ".join(result)
+
+def _apply_quotes(text: str) -> str:
+    words = text.split()
+    if len(words) < 10:
+        return text
+    result = list(words)
+    phrase_count = min(2, len(words) // 15)
+    step = len(words) // (phrase_count + 1)
+    for i in range(phrase_count, 0, -1):
+        start = i * step
+        length = 3 + random.randint(0, 3)
+        end = min(start + length, len(result))
+        result[start]   = '"' + result[start]
+        result[end - 1] = result[end - 1] + '"'
+    return " ".join(result)
 
 
 # ──────────────────────────────────────────────
@@ -222,8 +294,19 @@ async def _finish_race(code: str, room: Room, db: Session):
 # ──────────────────────────────────────────────
 
 class RoomCreateResponse(BaseModel):
-    room_code: str
-    room_id:   str
+    room_code:   str
+    room_id:     str
+    difficulty:  str
+    word_count:  int
+    max_players: int
+
+class RoomCreateRequest(BaseModel):
+    difficulty:       str  = "medium"  # easy | medium | hard
+    word_count:       int  = 50        # 25 | 50 | 75 | 100
+    max_players:      int  = 6         # 2 – 6
+    with_punctuation: bool = False
+    with_numbers:     bool = False
+    with_quotes:      bool = False
 
 class JoinRequest(BaseModel):
     room_code: str
@@ -235,9 +318,22 @@ class JoinRequest(BaseModel):
 
 @router.post("/", response_model=RoomCreateResponse, summary="Create a new race room")
 def create_room(
-    current_user: User    = Depends(get_current_user),
-    db:           Session = Depends(get_session),
+    body:         RoomCreateRequest = RoomCreateRequest(),
+    current_user: User              = Depends(get_current_user),
+    db:           Session           = Depends(get_session),
 ):
+    difficulty  = body.difficulty if body.difficulty in RACE_PROMPTS else "medium"
+    word_count  = max(10, min(body.word_count, 200))
+    max_players = max(2, min(body.max_players, 20))
+
+    # Pick prompt, trim to word count, apply modifiers
+    raw   = random.choice(RACE_PROMPTS[difficulty])
+    words = raw.split()
+    prompt_text = " ".join(words[:word_count])
+    if body.with_quotes:      prompt_text = _apply_quotes(prompt_text)
+    if body.with_numbers:     prompt_text = _apply_numbers(prompt_text)
+    if body.with_punctuation: prompt_text = _apply_punctuation(prompt_text)
+
     for _ in range(10):
         code = _gen_code()
         existing = db.exec(
@@ -249,8 +345,9 @@ def create_room(
     room = Room(
         code=code,
         host_id=current_user.user_id,
-        prompt_text=random.choice(RACE_PROMPTS),
+        prompt_text=prompt_text,
         status="waiting",
+        max_players=max_players,
     )
     db.add(room)
     db.flush()
@@ -262,7 +359,13 @@ def create_room(
     ))
     db.commit()
     db.refresh(room)
-    return RoomCreateResponse(room_code=room.code, room_id=str(room.room_id))
+    return RoomCreateResponse(
+        room_code=room.code,
+        room_id=str(room.room_id),
+        difficulty=difficulty,
+        word_count=word_count,
+        max_players=max_players,
+    )
 
 
 @router.post("/join", response_model=RoomCreateResponse, summary="Join a room by code")
@@ -278,8 +381,9 @@ def join_room(
         raise HTTPException(400, "Race already started or finished")
 
     players = db.exec(select(RoomPlayer).where(RoomPlayer.room_id == room.room_id)).all()
-    if len(players) >= 6:
-        raise HTTPException(400, "Room is full (max 6 players)")
+    max_p = getattr(room, 'max_players', 6) or 6
+    if len(players) >= max_p:
+        raise HTTPException(400, f"Room is full (max {max_p} players)")
 
     already = next((p for p in players if p.user_id == current_user.user_id), None)
     if not already:
