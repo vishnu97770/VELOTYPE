@@ -52,23 +52,23 @@ const CSS = `
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 40px 20px 80px;
+  padding: 60px 40px 100px;
   font-family: 'Outfit', sans-serif;
   color: #e2e2e2;
 }
 .mp-title {
-  font-size: clamp(28px,5vw,48px);
+  font-size: clamp(36px,5vw,60px);
   font-weight: 900;
   color: #fff;
   letter-spacing: -1px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   text-align: center;
 }
 .mp-title span { color: #FFD600; text-shadow: 0 0 24px rgba(255,214,0,0.5); }
 .mp-subtitle {
   color: #555;
-  font-size: 14px;
-  margin-bottom: 48px;
+  font-size: 17px;
+  margin-bottom: 56px;
   text-align: center;
   font-family: 'JetBrains Mono', monospace;
 }
@@ -76,43 +76,43 @@ const CSS = `
 /* ── Lobby ── */
 .mp-lobby {
   display: flex;
-  gap: 24px;
+  gap: 28px;
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
-  max-width: 720px;
+  max-width: 1000px;
 }
 .mp-card {
   flex: 1;
-  min-width: 280px;
+  min-width: 340px;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,214,0,0.1);
-  border-radius: 16px;
-  padding: 32px;
+  border-radius: 18px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 .mp-card h2 {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 800;
   color: #fff;
   margin: 0;
 }
 .mp-card p {
-  font-size: 13px;
+  font-size: 15px;
   color: #555;
   margin: 0;
   font-family: 'JetBrains Mono', monospace;
 }
 .mp-input {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 20px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,214,0,0.2);
-  border-radius: 10px;
+  border-radius: 12px;
   color: #fff;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 4px;
@@ -126,9 +126,9 @@ const CSS = `
   box-shadow: 0 0 0 3px rgba(255,214,0,0.08);
 }
 .mp-btn {
-  padding: 14px 28px;
-  border-radius: 10px;
-  font-size: 15px;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 17px;
   font-weight: 800;
   cursor: pointer;
   border: none;
@@ -160,25 +160,25 @@ const CSS = `
 
 /* ── Room Options ── */
 .mp-options-label {
-  font-size: 11px;
+  font-size: 13px;
   color: #555;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   font-family: 'JetBrains Mono', monospace;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .mp-options-row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 .mp-opt-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.1);
   background: rgba(255,255,255,0.04);
   color: #888;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
   cursor: pointer;

@@ -191,14 +191,14 @@ const styles = `
   width: 100vw;
   display: flex;
   flex-direction: column;
-  padding: 0 60px;
+  padding: 0 80px;
   color: var(--text);
   perspective: 1200px;
 }
 
 .tt-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -272,10 +272,10 @@ const styles = `
   background: none;
   border: none;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--sub);
   cursor: pointer;
-  padding: 7px 16px;
+  padding: 8px 18px;
   border-radius: 10px;
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
@@ -389,7 +389,7 @@ const styles = `
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 16px 22px;
+  padding: 20px 28px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.09);
   border-radius: 16px;
@@ -397,7 +397,7 @@ const styles = `
   -webkit-backdrop-filter: blur(30px);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   transform-style: preserve-3d;
-  min-width: 96px;
+  min-width: 120px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
   position: relative;
   overflow: hidden;
@@ -424,7 +424,7 @@ const styles = `
 
 
 .tt-stat-label {
-  font-size: 10px;
+  font-size: 13px;
   color: var(--sub);
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -432,7 +432,7 @@ const styles = `
 
 .tt-stat-value {
   font-family: 'Outfit', sans-serif;
-  font-size: 30px;
+  font-size: 38px;
   font-weight: 800;
   color: #FFD600;
   line-height: 1;
@@ -518,7 +518,7 @@ const styles = `
 
 /* ── Words ── */
 .tt-words {
-  font-size: 26px;
+  font-size: 30px;
   line-height: 2.2;
   letter-spacing: 0.5px;
   color: var(--sub);

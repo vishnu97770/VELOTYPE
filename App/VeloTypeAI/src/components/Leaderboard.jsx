@@ -41,46 +41,46 @@ const CSS = `
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48px 20px 80px;
+  padding: 60px 40px 100px;
   font-family: 'Outfit', sans-serif;
   color: #e2e2e2;
 }
 .lb-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
 }
 .lb-title {
-  font-size: clamp(28px,5vw,48px);
+  font-size: clamp(36px,5vw,60px);
   font-weight: 900;
   color: #fff;
   letter-spacing: -1px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .lb-title span { color: #FFD600; text-shadow: 0 0 24px rgba(255,214,0,0.5); }
-.lb-subtitle { font-size: 14px; color: #555; font-family: 'JetBrains Mono', monospace; }
+.lb-subtitle { font-size: 17px; color: #555; font-family: 'JetBrains Mono', monospace; }
 .lb-me-card {
   width: 100%;
-  max-width: 840px;
-  margin-bottom: 24px;
+  max-width: 1100px;
+  margin-bottom: 28px;
   background: rgba(255,214,0,0.05);
   border: 1px solid rgba(255,214,0,0.2);
-  border-radius: 14px;
-  padding: 20px 24px;
+  border-radius: 16px;
+  padding: 28px 36px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 28px;
   flex-wrap: wrap;
 }
-.lb-me-label { font-size: 11px; color: rgba(255,214,0,0.6); text-transform: uppercase; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; margin-bottom: 4px; }
-.lb-me-val { font-size: 22px; font-weight: 900; color: #FFD600; }
+.lb-me-label { font-size: 13px; color: rgba(255,214,0,0.6); text-transform: uppercase; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; margin-bottom: 6px; }
+.lb-me-val { font-size: 28px; font-weight: 900; color: #FFD600; }
 .lb-me-stat { display: flex; flex-direction: column; }
-.lb-me-divider { width: 1px; height: 40px; background: rgba(255,214,0,0.15); flex-shrink: 0; }
+.lb-me-divider { width: 1px; height: 50px; background: rgba(255,214,0,0.15); flex-shrink: 0; }
 .lb-table-wrap {
   width: 100%;
-  max-width: 840px;
+  max-width: 1100px;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 16px;
+  border-radius: 18px;
   overflow: hidden;
 }
 .lb-table {
@@ -91,8 +91,8 @@ const CSS = `
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .lb-table thead th {
-  padding: 14px 16px;
-  font-size: 11px;
+  padding: 18px 24px;
+  font-size: 13px;
   font-weight: 700;
   color: #444;
   text-align: left;
@@ -109,40 +109,40 @@ const CSS = `
 .lb-table tbody tr.lb-row-me { background: rgba(255,214,0,0.04); }
 .lb-table tbody tr.lb-row-me:hover { background: rgba(255,214,0,0.07); }
 .lb-table tbody td {
-  padding: 14px 16px;
-  font-size: 14px;
+  padding: 18px 24px;
+  font-size: 17px;
   vertical-align: middle;
 }
 .lb-pos {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 800;
   font-family: 'JetBrains Mono', monospace;
   color: #333;
-  width: 48px;
+  width: 60px;
 }
 .lb-pos.top1 { color: #FFD600; }
 .lb-pos.top2 { color: #c0c0c0; }
-.lb-pos.top3 { color: '#cd7f32'; }
+.lb-pos.top3 { color: #cd7f32; }
 .lb-username {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 18px;
 }
 .lb-username-me { color: #FFD600; }
 .lb-elo {
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 800;
   color: #fff;
   font-family: 'JetBrains Mono', monospace;
 }
 .lb-wl {
-  font-size: 13px;
+  font-size: 16px;
   color: #555;
   font-family: 'JetBrains Mono', monospace;
 }
 .lb-wl .w { color: #4ade80; }
 .lb-wl .l { color: #f87171; }
 .lb-wpm {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: #888;
   font-family: 'JetBrains Mono', monospace;
@@ -151,24 +151,24 @@ const CSS = `
   color: #555;
   font-family: 'JetBrains Mono', monospace;
   margin-top: 80px;
-  font-size: 14px;
+  font-size: 17px;
 }
 .lb-error {
   color: #ca4754;
   font-family: 'JetBrains Mono', monospace;
   margin-top: 40px;
-  font-size: 14px;
+  font-size: 17px;
 }
-.lb-actions { margin-bottom: 24px; }
+.lb-actions { margin-bottom: 28px; }
 .lb-race-btn {
-  padding: 13px 28px;
+  padding: 15px 36px;
   background: #FFD600;
   color: #0A0A0A;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 18px;
   font-family: 'Outfit', sans-serif;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(255,214,0,0.3);
   text-decoration: none;
