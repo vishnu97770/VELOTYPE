@@ -112,7 +112,7 @@ app.include_router(leaderboard.router,  prefix=f"{API_PREFIX}/leaderboard", tags
 #  Health Check
 # ──────────────────────────────────────────────
 
-@app.get("/api/v1/health", tags=["Health"])
+@app.api_route("/api/v1/health", methods=["GET", "HEAD"], tags=["Health"])
 def health_check():
     """Quick endpoint to confirm the API is running."""
     return {
