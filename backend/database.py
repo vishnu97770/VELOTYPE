@@ -11,10 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL: str = os.getenv(
-    "DATABASE_URL",
-    "postgresql://velotype_db_user:1YBspfyQFkekTfcTcHsbnInvJRJCUR4o@dpg-d7u24q0sfn5c73cjp7kg-a.singapore-postgres.render.com/velotype_db",
-)
+DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./velotypeai.db")
 
 # Fix for Render: SQLAlchemy expects postgresql:// but Render provides postgres://
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):

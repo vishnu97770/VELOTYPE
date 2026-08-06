@@ -23,7 +23,15 @@ router = APIRouter()
 #  JWT Config
 # ──────────────────────────────────────────────
 
-SECRET_KEY: str           = os.getenv("SECRET_KEY", "changeme-use-a-long-random-secret")
+SECRET_KEY: Optional[str] = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY environment variable is not set. Refusing to start with no "
+        "JWT signing key — set SECRET_KEY in backend/.env (local) or the Render "
+        "dashboard (production). A random per-process fallback is deliberately "
+        "not used here: it would issue tokens that fail validation on any other "
+        "worker process, producing unexplainable 401s under multi-worker deploys."
+    )
 ALGORITHM: str            = "HS256"
 ACCESS_TOKEN_EXPIRE_MIN   = 15    # 15 minutes
 REFRESH_TOKEN_EXPIRE_DAYS = 7     # 7 days

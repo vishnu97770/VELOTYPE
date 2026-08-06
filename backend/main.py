@@ -18,7 +18,6 @@ load_dotenv()
 
 ENVIRONMENT: str = os.getenv("ENVIRONMENT", "production")
 FRONTEND_URL: str = os.getenv("FRONTEND_URL", "velotype-three.vercel.app")
-GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "AIzaSyAlWeUvVch-Pk-rqDAOTJaTQeH9ivkwFeQ")
 
 # ──────────────────────────────────────────────
 #  Rate Limiter
