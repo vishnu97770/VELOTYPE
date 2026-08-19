@@ -17,7 +17,6 @@ from database import init_db
 load_dotenv()
 
 ENVIRONMENT: str = os.getenv("ENVIRONMENT", "production")
-FRONTEND_URL: str = os.getenv("FRONTEND_URL", "velotype-three.vercel.app")
 
 # ──────────────────────────────────────────────
 #  Rate Limiter
@@ -41,8 +40,6 @@ async def lifespan(app: FastAPI):
     print(" Shutting down VeloTypeAI API...")
 
 
-    
-
 app = FastAPI(
 title="VeloTypeAI API",
 description="AI-Powered Adaptive Typing Assistant & Pattern-Based Learning System",
@@ -61,8 +58,16 @@ lifespan=lifespan,
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS — credentials require explicit origins (never wildcard with credentials:include)
-# Build allowed origins list from FRONTEND_URL env var plus common dev origins
+# CORS — credentials require explicit origins (never wildcard with credentials:include).
+# Set FRONTEND_URL in Render's environment dashboard (comma-separated for multiple).
+# Example: FRONTEND_URL=https://velotype-sigma.vercel.app,https://velotype-three.vercel.app
+def _normalise_origin(raw: str) -> str:
+    """Add https:// if scheme is missing; strip trailing slashes."""
+    raw = raw.strip().rstrip("/")
+    if raw and not raw.startswith(("http://", "https://")):
+        raw = "https://" + raw
+    return raw
+
 _dev_origins = [
     "http://localhost:5173",
     "http://localhost:5174",
@@ -73,11 +78,19 @@ _dev_origins = [
     "http://127.0.0.1:5174",
     "http://127.0.0.1:4173",
 ]
-_prod_origins = [o.strip() for o in FRONTEND_URL.split(",") if o.strip()]
-_prod_origins.append("https://velotype-three.vercel.app")
+
+_frontend_url_raw = os.getenv("FRONTEND_URL", "")
+_prod_origins = [
+    _normalise_origin(o)
+    for o in _frontend_url_raw.split(",")
+    if o.strip()
+]
+# Always allow the backend itself (Swagger UI, Render internal health checks)
 _prod_origins.append("https://velotype-2-jn34.onrender.com")
 
 allowed_origins = list(set(_dev_origins + _prod_origins))
+
+print(f"[CORS] Allowed origins: {allowed_origins}")
 
 
 
