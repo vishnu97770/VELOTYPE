@@ -21,6 +21,11 @@ function Login() {
   const navigator = useNavigate();
   const [searchParams] = useSearchParams();
 
+  // ── Backend warm-up ping (fire-and-forget; Render free tier cold-start) ──
+  useEffect(() => {
+    fetch(`${API_BASE}/health`).catch(() => {});
+  }, []);
+
   // Handle redirect back from OAuth (backend sends ?token=<jwt>)
   useEffect(() => {
     const token = searchParams.get('token');

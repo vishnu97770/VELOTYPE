@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'https://velotype-2-jn34.onrender.com/api/v1';
+
 // ─────────────────────────────────────────────
 //  Data
 // ─────────────────────────────────────────────
@@ -205,6 +207,11 @@ export default function Landing() {
   const [counters, setCounters]         = useState({ wpm: 0, acc: 0, sessions: 0 });
   const [countStarted, setCountStarted] = useState(false);
   const counterRef = useRef(null);
+
+  // ── Backend warm-up ping (fire-and-forget; Render free tier cold-start) ──
+  useEffect(() => {
+    fetch(`${API_BASE}/health`).catch(() => {});
+  }, []);
 
   // ── Particle canvas ──
   useEffect(() => {
