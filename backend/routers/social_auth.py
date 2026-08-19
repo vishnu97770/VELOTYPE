@@ -25,6 +25,13 @@ def _frontend() -> str:
         raw = "https://" + raw
     return raw.rstrip("/").split(",")[0]   # take first if comma-separated
 
+# Log resolved URLs at import time so they appear in deploy logs on every startup.
+# If either still shows localhost in production, the env var is not set on Render.
+print(f"[OAuth] BACKEND_URL  resolved → {_backend()}")
+print(f"[OAuth] FRONTEND_URL resolved → {_frontend()}")
+print(f"[OAuth] Google redirect_uri   → {_backend()}/api/v1/auth/google/callback")
+print(f"[OAuth] GitHub redirect_uri   → {_backend()}/api/v1/auth/github/callback")
+
 
 # ── Shared: find-or-create user from OAuth info ────────────────────────────────
 

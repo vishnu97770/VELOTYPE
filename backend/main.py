@@ -85,8 +85,12 @@ _prod_origins = [
     for o in _frontend_url_raw.split(",")
     if o.strip()
 ]
-# Always allow the backend itself (Swagger UI, Render internal health checks)
-_prod_origins.append("https://velotype-2-jn34.onrender.com")
+
+# Allow the backend's own origin so the Swagger UI can call the API in-browser.
+# Built from BACKEND_URL so it tracks the deployed domain automatically.
+_backend_url = os.getenv("BACKEND_URL", "").rstrip("/")
+if _backend_url:
+    _prod_origins.append(_normalise_origin(_backend_url))
 
 allowed_origins = list(set(_dev_origins + _prod_origins))
 
